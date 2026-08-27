@@ -14,18 +14,24 @@
 html,body{background:var(--ink);color:var(--paper);font-family:var(--font);-webkit-text-size-adjust:100%}
 body{padding:0 0 60px;line-height:1.55}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-input,select{font-family:inherit}
+input,select,textarea{font-family:inherit}
 :focus-visible{outline:2px solid var(--bulb);outline-offset:2px}
 .wrap{max-width:760px;margin:0 auto;padding:0 18px}
+[hidden]{display:none!important}
 
-.sign{padding:28px 0 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
-.sign h1{font-size:clamp(28px,7.5vw,44px);font-weight:900;letter-spacing:.06em;line-height:1.05}
+.sign{padding:26px 0 14px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sign h1{font-size:clamp(26px,7vw,40px);font-weight:900;letter-spacing:.06em;line-height:1.05}
 .sign h1 em{font-style:normal;color:var(--bulb)}
 .mode{margin-left:auto;font-size:11.5px;letter-spacing:.12em;font-weight:800;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--paper-dim);white-space:nowrap}
 .mode.g{background:var(--bulb);color:#221A05;border-color:var(--bulb)}
 
-/* 金鑰 */
-.keybox{padding:14px 0 4px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.tab{flex:1;padding:12px 6px;font-size:14px;font-weight:700;color:#7d8a84;border-bottom:2px solid transparent;letter-spacing:.06em;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--bulb);border-bottom-color:var(--bulb)}
+.tab .badge{font-size:11px;font-weight:800;background:var(--ink-2);color:var(--paper-dim);padding:1px 6px;border-radius:999px;margin-left:4px}
+.tab[aria-selected="true"] .badge{background:var(--bulb);color:#221A05}
+
+.keybox{padding:12px 0 0}
 .keybox summary{font-size:12.5px;color:#7d8a84;cursor:pointer;letter-spacing:.04em;list-style:none}
 .keybox summary::-webkit-details-marker{display:none}
 .keybox summary::before{content:"▸ ";color:var(--bulb)}
@@ -36,14 +42,14 @@ input,select{font-family:inherit}
 .where{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 0}
 .where input,.keybox input{flex:1 1 190px;min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;border-radius:9px;font-size:15px}
 .where input::placeholder,.keybox input::placeholder{color:#7d8a84}
-.btn{background:var(--paper);color:var(--ink);font-weight:700;font-size:14px;padding:11px 16px;border-radius:9px;letter-spacing:.04em;white-space:nowrap;display:inline-block;text-decoration:none}
+.btn{background:var(--paper);color:var(--ink);font-weight:700;font-size:14px;padding:11px 16px;border-radius:9px;letter-spacing:.04em;white-space:nowrap;display:inline-block;text-decoration:none;text-align:center}
 .btn:active{transform:translateY(1px)}
 .btn.ghost{background:transparent;color:var(--paper);border:1px solid var(--line);font-weight:600}
+.btn.warn{background:transparent;color:#F09A8E;border:1px solid #6a3a34;font-weight:600}
 .btn[disabled]{opacity:.45;cursor:default}
 .locnote{width:100%;font-size:12.5px;color:var(--paper-dim);min-height:18px}
 .locnote.bad{color:#F09A8E}
 
-/* 抽籤燈箱 */
 .lightbox{margin:6px 0 20px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#20302A,#182420);border:1px solid var(--line)}
 .lightbox .bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sign-red)}
 .lightbox .bar b{font-size:14px;letter-spacing:.14em;font-weight:800}
@@ -57,30 +63,26 @@ input,select{font-family:inherit}
 .roll{display:block;width:100%;background:var(--bulb);color:#221A05;font-size:17px;font-weight:900;letter-spacing:.16em;padding:16px}
 .roll[disabled]{background:#4a4a3f;color:#8d8d80}
 
-/* 分類與篩選 */
 .flabel{font-size:11.5px;letter-spacing:.2em;color:#7d8a84;font-weight:700;margin:14px 0 9px}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--paper-dim)}
 .chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
+.chip.live[aria-pressed="true"]{background:#1E7A4B;color:#fff;border-color:#1E7A4B}
+.chip .n{font-size:11.5px;opacity:.65;margin-left:5px}
 .rowline{display:flex;align-items:center;gap:12px;margin-bottom:9px}
 .rowline[hidden]{display:none}
-.nodata{font-size:12.5px;color:#6e7a74;padding:2px 0 6px;line-height:1.7}
 .rowline label{font-size:13px;color:var(--paper-dim);min-width:66px}
 .rowline input[type=range]{flex:1;accent-color:var(--sign-red)}
 .rowline b{font-size:13.5px;min-width:70px;text-align:right;color:var(--bulb)}
 .go{width:100%;background:var(--sign-red);color:#fff;font-size:15px;font-weight:800;letter-spacing:.14em;padding:14px;border-radius:10px;margin-top:12px}
 .go[disabled]{background:#4a3733;color:#9b8a86}
+.nodata{font-size:12.5px;color:#6e7a74;padding:2px 0 6px;line-height:1.7}
 
-.promos{margin:20px 0 0;border-left:3px solid var(--bulb);padding-left:14px}
-.promos h2{font-size:12px;letter-spacing:.2em;color:var(--bulb);font-weight:800;margin-bottom:8px}
-.promos li{list-style:none;font-size:14px;padding:5px 0;border-bottom:1px dashed var(--line)}
-.promos li:last-child{border-bottom:none}
-.promos li s{color:#7d8a84;text-decoration:none;font-size:12.5px;margin-left:6px}
-
-.listhead{display:flex;align-items:baseline;gap:10px;margin-top:24px;padding:14px 0 12px;border-top:1px solid var(--line)}
+.listhead{display:flex;align-items:baseline;gap:10px;margin-top:22px;padding:14px 0 12px;border-top:1px solid var(--line)}
 .listhead h2{font-size:13px;letter-spacing:.16em;font-weight:800}
 .listhead .cnt{font-size:12.5px;color:#7d8a84}
 .listhead select{margin-left:auto;background:var(--ink-2);color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px}
+
 .card{background:var(--paper);color:var(--ink);border-radius:12px;padding:13px 15px;margin-bottom:9px;display:flex;gap:12px;align-items:flex-start}
 .card .body{flex:1;min-width:0}
 .card .nm{font-size:16.5px;font-weight:800;line-height:1.3;word-break:break-word}
@@ -89,15 +91,51 @@ input,select{font-family:inherit}
 .card .rate .no{color:#9aa39d;font-weight:400}
 .card .sub{font-size:12.5px;color:#5c6660;margin-top:3px}
 .card .tag{display:inline-block;background:var(--ink);color:var(--paper);font-size:11px;padding:2px 8px;border-radius:999px;margin-right:5px}
+.card .been{display:inline-block;background:#1E7A4B;color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;margin-right:5px;font-weight:700}
 .card .open{color:#1E7A4B;font-weight:700}
 .card .shut{color:#B4483A;font-weight:700}
+.card .memo{font-size:12.5px;color:#8a5a1f;margin-top:5px;line-height:1.6;white-space:pre-wrap}
 .card .side{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
 .card .dist{font-size:13px;font-weight:800;color:var(--sign-red);white-space:nowrap}
-.mini{font-size:12px;font-weight:700;padding:5px 9px;border-radius:7px;background:var(--ink);color:var(--paper);white-space:nowrap;text-decoration:none}
-.empty{text-align:center;color:#7d8a84;font-size:14px;padding:34px 10px;line-height:1.9}
+.mini{font-size:12px;font-weight:700;padding:5px 9px;border-radius:7px;background:var(--ink);color:var(--paper);white-space:nowrap;text-decoration:none;display:inline-block}
+.mini.heart{background:transparent;color:#9aa39d;border:1px solid #c8c0b0;font-size:14px;padding:4px 9px}
+.mini.heart.on{background:var(--sign-red);color:#fff;border-color:var(--sign-red)}
+.mini.pale{background:transparent;color:#5c6660;border:1px solid #c8c0b0}
+
+.shots{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.shots img{width:78px;height:78px;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#ddd6c8}
+.logdate{font-size:12px;color:#5c6660;font-weight:700;letter-spacing:.05em}
+.stars-ro{color:var(--sign-red);font-size:13.5px;font-weight:700}
+
+.empty{text-align:center;color:#7d8a84;font-size:14px;padding:38px 10px;line-height:1.9}
 .warn{background:#3A2D18;border:1px solid var(--bulb);border-radius:10px;padding:12px 14px;font-size:13px;color:#F0DFB4;margin-bottom:12px;line-height:1.7}
 .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:#6e7a74;line-height:1.8}
 .foot a{color:var(--paper-dim)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools .btn{font-size:12.5px;padding:8px 12px}
+
+.sheet{position:fixed;inset:0;background:rgba(8,14,12,.78);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;overflow:auto}
+.sheet.open{display:flex}
+.sheet .panel{background:var(--paper);color:var(--ink);border-radius:14px;padding:20px;width:100%;max-width:420px;margin:auto}
+.sheet h3{font-size:17px;font-weight:900;margin-bottom:12px}
+.sheet label.f{display:block;font-size:12px;font-weight:700;color:#5c6660;letter-spacing:.08em;margin:12px 0 5px}
+.sheet input[type=text],.sheet input[type=date],.sheet textarea{
+  width:100%;border:1px solid #c8c0b0;border-radius:9px;padding:10px;font-size:15px;background:#fff;color:var(--ink)}
+.sheet textarea{resize:vertical;min-height:80px;line-height:1.6}
+.stars{display:flex;gap:5px}
+.stars button{font-size:28px;color:#c8c0b0;line-height:1}
+.stars button.on{color:var(--sign-red)}
+.sheet .row{display:flex;gap:8px;margin-top:18px}
+.sheet .row .btn{flex:1;background:var(--ink);color:var(--paper)}
+.sheet .row .btn.ghost{background:transparent;color:#5c6660;border:1px solid #c8c0b0}
+.sheet .row .btn.warn{background:transparent;color:#B4483A;border:1px solid #d8b0aa;flex:0 0 auto}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.thumb{position:relative}
+.thumb img{width:70px;height:70px;object-fit:cover;border-radius:8px}
+.thumb button{position:absolute;top:-6px;right:-6px;background:#B4483A;color:#fff;width:22px;height:22px;border-radius:50%;font-size:14px;font-weight:700;line-height:1}
+.viewer{position:fixed;inset:0;background:rgba(8,14,12,.94);display:none;align-items:center;justify-content:center;z-index:60;padding:12px}
+.viewer.open{display:flex}
+.viewer img{max-width:100%;max-height:100%;border-radius:10px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -109,6 +147,14 @@ input,select{font-family:inherit}
     <span class="mode" id="modeTag">OSM 模式</span>
   </header>
 
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabFind" aria-selected="true">找店</button>
+    <button class="tab" role="tab" id="tabFav"  aria-selected="false">口袋名單<span class="badge" id="favN">0</span></button>
+    <button class="tab" role="tab" id="tabLog"  aria-selected="false">用餐記錄<span class="badge" id="logN">0</span></button>
+  </nav>
+
+<!-- ══════════════ 找店 ══════════════ -->
+<section id="paneFind">
   <details class="keybox" id="keybox">
     <summary>連線設定</summary>
     <div class="inner">
@@ -118,11 +164,8 @@ input,select{font-family:inherit}
       <button class="btn" id="btnKey">套用</button>
       <button class="btn ghost" id="btnKeyClear">清除</button>
       <div class="hint">
-        三種來源，由上往下優先：<br>
-        <b>代理</b> — 金鑰在 Apps Script 那端，這台裝置看不到。分享給別人用這個。<br>
-        <b>金鑰</b> — 直接從瀏覽器打 Google。自己測試用。<br>
-        <b>都不填</b> — 走 OpenStreetMap，免金鑰，但沒有星等。<br>
-        填的東西只留在這台裝置的瀏覽器裡。
+        三種來源，由上往下優先：<b>代理</b>（金鑰藏在 Apps Script）、<b>金鑰</b>（瀏覽器直連 Google）、
+        <b>都不填</b>（OpenStreetMap，沒有星等和營業狀態）。填的東西只留在這台裝置。
       </div>
     </div>
   </details>
@@ -150,11 +193,6 @@ input,select{font-family:inherit}
   </div>
   <button class="go" id="btnGo" disabled>找 這 附 近</button>
 
-  <div class="promos" id="promos" hidden>
-    <h2>本 週 優 惠</h2>
-    <ul id="promoList"></ul>
-  </div>
-
   <div class="listhead">
     <h2>結 果</h2>
     <span class="cnt" id="cnt"></span>
@@ -167,6 +205,10 @@ input,select{font-family:inherit}
 
   <div class="flabel" id="filtLabel" hidden>再 篩 一 次</div>
   <div id="filters" hidden>
+    <div class="rowline" id="rowOpen">
+      <label>現在</label>
+      <button class="chip live" id="chipOpen" aria-pressed="false">只看營業中<span class="n" id="openN"></span></button>
+    </div>
     <div class="rowline" id="rowRate">
       <label>最低星等</label>
       <input type="range" id="minRate" min="0" max="4.8" step="0.1" value="0">
@@ -183,29 +225,97 @@ input,select{font-family:inherit}
     </div>
   </div>
 
-  <div class="nodata" id="noFilt" hidden>這批結果沒有評分或價位資料，所以沒有可篩的條件。要按星等篩，得填 Google 金鑰。</div>
+  <div class="nodata" id="noFilt" hidden>這批結果沒有評分、價位或營業狀態，所以沒有可篩的條件。要篩這些，得填 Google 金鑰或代理。</div>
   <div id="warnBox"></div>
   <div id="list"><div class="empty">定位並按「找這附近」，結果會出現在這裡。</div></div>
-
   <footer class="foot" id="foot"></footer>
+</section>
+
+<!-- ══════════════ 口袋名單 ══════════════ -->
+<section id="paneFav" hidden>
+  <div class="listhead" style="margin-top:16px">
+    <h2>口 袋 名 單</h2>
+    <span class="cnt" id="favCnt"></span>
+    <select id="favSort">
+      <option value="added">依收藏時間</option>
+      <option value="name">依店名</option>
+      <option value="rating">依 Google 評分</option>
+    </select>
+  </div>
+  <div id="favList"></div>
+</section>
+
+<!-- ══════════════ 用餐記錄 ══════════════ -->
+<section id="paneLog" hidden>
+  <div class="listhead" style="margin-top:16px">
+    <h2>用 餐 記 錄</h2>
+    <span class="cnt" id="logCnt"></span>
+    <select id="logSort">
+      <option value="date">依日期</option>
+      <option value="rate">依我的評分</option>
+    </select>
+  </div>
+  <div class="tools">
+    <button class="btn" id="btnNewLog">＋ 手動新增一筆</button>
+    <button class="btn ghost" id="btnExport">匯出備份</button>
+    <button class="btn ghost" id="btnImport">匯入備份</button>
+    <input type="file" id="fileIn" accept="application/json" hidden>
+  </div>
+  <div id="logList"></div>
+  <footer class="foot">
+    收藏和記錄存在這台裝置的瀏覽器裡，換裝置不會同步，清除瀏覽資料會消失。<br>
+    重要的話定期用「匯出備份」存一份，換手機時用「匯入備份」搬過去。
+  </footer>
+</section>
+
 </div>
+
+<div class="sheet" id="logSheet">
+  <div class="panel">
+    <h3 id="lsTitle">記一筆</h3>
+    <label class="f">店名</label>
+    <input type="text" id="lsName" placeholder="店名">
+    <label class="f">日期</label>
+    <input type="date" id="lsDate">
+    <label class="f">我給幾分</label>
+    <div class="stars" id="lsStars"></div>
+    <label class="f">心得</label>
+    <textarea id="lsNote" placeholder="點了什麼、好不好吃、下次還要不要來…"></textarea>
+    <label class="f">照片</label>
+    <button class="btn ghost" id="lsAddPhoto" style="width:100%">＋ 加照片</button>
+    <input type="file" id="lsFile" accept="image/*" multiple hidden>
+    <div class="thumbs" id="lsThumbs"></div>
+    <div class="row">
+      <button class="btn warn" id="lsDelete" hidden>刪除</button>
+      <button class="btn ghost" id="lsCancel">取消</button>
+      <button class="btn" id="lsSave">存起來</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="favSheet">
+  <div class="panel">
+    <h3 id="fsTitle">備註</h3>
+    <label class="f">想記什麼</label>
+    <textarea id="fsNote" placeholder="例如：要訂位、只有平日中午有商業午餐"></textarea>
+    <div class="row">
+      <button class="btn ghost" id="fsCancel">取消</button>
+      <button class="btn" id="fsSave">存起來</button>
+    </div>
+  </div>
+</div>
+
+<div class="viewer" id="viewer"><img id="viewerImg" alt=""></div>
 
 <script src="config.js"></script>
 <script>
-/* 設定從旁邊的 config.js 讀，這個檔案不放任何網址或通行碼。
-   config.js 不存在也沒關係，會退回「連線設定」手動輸入。 */
+/* 設定從旁邊的 config.js 讀，這個檔不含任何網址或通行碼。
+   沒有 config.js 也能跑，會退回「連線設定」手動輸入。 */
 const CFG = (typeof window !== 'undefined' && window.EATWHAT_CONFIG) || {};
 const PROXY_URL   = CFG.proxyUrl   || '';
 const PROXY_TOKEN = CFG.proxyToken || '';
 
-/* 本週優惠也放 config.js，這樣改優惠不用動這個檔 */
-const PROMOS = CFG.promos || [];
-
-/* ══ 分類 ══════════════════════════════════════════
-   gtypes：Google Places 的 includedTypes。2026/2 那次改版補了很多，
-   火鍋、燒肉、串燒、台菜現在都有專屬類型了。
-   osm：沒有金鑰時用 cuisine 標籤 + 中文店名關鍵字判斷。
-   ════════════════════════════════════════════════ */
+/* ══ 分類 ══════════════════════════════════════════ */
 const CATS = [
   { id:'bbq', label:'燒烤',
     gtypes:['barbecue_restaurant','yakiniku_restaurant','korean_barbecue_restaurant','yakitori_restaurant','mongolian_barbecue_restaurant'],
@@ -255,37 +365,98 @@ const FIELDS = ['places.id','places.displayName','places.formattedAddress','plac
   'places.rating','places.userRatingCount','places.priceLevel','places.primaryTypeDisplayName',
   'places.currentOpeningHours.openNow','places.googleMapsUri'].join(',');
 
-let apiKey    = store('get','eatwhat.key')   || '';
-let proxyUrl  = store('get','eatwhat.proxy') || PROXY_URL;
-let proxyTok  = store('get','eatwhat.tok')   || PROXY_TOKEN;
-let origin = null, places = [], picked = new Set(), priceSel = new Set(), rollTimer = null;
-const googleOn = () => !!(proxyUrl || apiKey);
 const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDist = m => m<1000 ? Math.round(m)+' m' : (m/1000).toFixed(1)+' km';
+const today = () => new Date().toISOString().slice(0,10);
 
-function store(op, k, v){
+function store(op,k,v){
   try{ if(op==='get') return localStorage.getItem(k);
        if(op==='set') localStorage.setItem(k,v);
        if(op==='del') localStorage.removeItem(k); }catch(e){ return null; }
 }
-const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const fmtDist = m => m<1000 ? Math.round(m)+' m' : (m/1000).toFixed(1)+' km';
 function distance(a,b){
   const R=6371000, rad=d=>d*Math.PI/180;
   const dLat=rad(b.lat-a.lat), dLon=rad(b.lon-a.lon);
   const x=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
   return 2*R*Math.asin(Math.sqrt(x));
 }
-function setNote(m,bad){ const e=$('#locnote'); e.textContent=m; e.classList.toggle('bad',!!bad); }
 
-/* ── 模式 ──────────────────────────────────────── */
+/* ══ 本機儲存（IndexedDB，照片用 Blob） ═══════════ */
+let dbp = null;
+function db(){
+  if(dbp) return dbp;
+  dbp = new Promise((res,rej)=>{
+    if(!window.indexedDB) return rej(new Error('這個瀏覽器不支援 IndexedDB'));
+    const r = indexedDB.open('eatwhat',1);
+    r.onupgradeneeded = e => {
+      const d = e.target.result;
+      if(!d.objectStoreNames.contains('favs')) d.createObjectStore('favs',{keyPath:'id'});
+      if(!d.objectStoreNames.contains('logs')){
+        d.createObjectStore('logs',{keyPath:'id',autoIncrement:true}).createIndex('placeId','placeId');
+      }
+    };
+    r.onsuccess = () => res(r.result);
+    r.onerror   = () => rej(r.error);
+  });
+  return dbp;
+}
+const done = r => new Promise((res,rej)=>{ r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); });
+async function dbAll(s){ const d=await db(); return done(d.transaction(s).objectStore(s).getAll()); }
+async function dbPut(s,v){ const d=await db(); return done(d.transaction(s,'readwrite').objectStore(s).put(v)); }
+async function dbDel(s,k){ const d=await db(); return done(d.transaction(s,'readwrite').objectStore(s).delete(k)); }
+
+let favs = new Map(), logs = [];
+const urlCache = new Map();
+function blobUrl(b){
+  if(!urlCache.has(b)) urlCache.set(b, URL.createObjectURL(b));
+  return urlCache.get(b);
+}
+async function loadStore(){
+  try{
+    favs = new Map((await dbAll('favs')).map(f => [f.id, f]));
+    logs = await dbAll('logs');
+  }catch(e){
+    favs = new Map(); logs = [];
+    console.warn('本機儲存不可用：', e.message);
+  }
+  updateBadges();
+}
+function updateBadges(){
+  $('#favN').textContent = favs.size;
+  $('#logN').textContent = logs.length;
+}
+const visitCount = pid => logs.filter(l => l.placeId && l.placeId === pid).length;
+
+/* ══ 分頁 ══════════════════════════════════════════ */
+const PANES = { tabFind:'paneFind', tabFav:'paneFav', tabLog:'paneLog' };
+Object.keys(PANES).forEach(t => {
+  $('#'+t).addEventListener('click', () => {
+    Object.entries(PANES).forEach(([k,v]) => {
+      const on = k === t;
+      $('#'+k).setAttribute('aria-selected', on);
+      $('#'+v).hidden = !on;
+    });
+    if(t==='tabFav') renderFavs();
+    if(t==='tabLog') renderLogs();
+    window.scrollTo(0,0);
+  });
+});
+
+/* ══ 連線模式 ══════════════════════════════════════ */
+let apiKey   = store('get','eatwhat.key')   || '';
+let proxyUrl = store('get','eatwhat.proxy') || PROXY_URL;
+let proxyTok = store('get','eatwhat.tok')   || PROXY_TOKEN;
+const googleOn = () => !!(proxyUrl || apiKey);
+
 function refreshMode(){
   const g = googleOn();
   $('#modeTag').textContent = proxyUrl ? '代理模式' : apiKey ? 'Google 模式' : 'OSM 模式';
   $('#modeTag').classList.toggle('g', g);
   $('#sortBy').value = g ? 'rating' : 'dist';
   $('#foot').innerHTML = g
-    ? '店家資料與評分來自 Google 地圖。星等和評論數為 Google 使用者所評，非本工具產生。'
-    : '店家資料 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者。這個模式沒有星等，點「地圖」可以到 Google 上看評價。';
+    ? '店家資料與評分來自 Google 地圖。星等和評論數為 Google 使用者所評，非本工具產生。營業狀態依店家自填的營業時間推算，僅供參考。'
+    : '店家資料 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者。這個模式沒有星等和營業狀態，點「地圖」可以到 Google 上看。';
 }
 $('#btnKey').addEventListener('click', () => {
   const u = $('#proxyUrl').value.trim(), t = $('#proxyToken').value.trim(), k = $('#apikey').value.trim();
@@ -299,8 +470,7 @@ $('#btnKey').addEventListener('click', () => {
   }
   if(k){ apiKey = k; store('set','eatwhat.key',k); }
   $('#apikey').value = ''; $('#proxyToken').value = ''; $('#keybox').open = false;
-  refreshMode();
-  setNote(proxyUrl ? '已切到代理模式。按「找這附近」試試。' : '已切到 Google 模式。按「找這附近」試試。');
+  refreshMode(); setNote('設定好了。按「找這附近」試試。');
 });
 $('#btnKeyClear').addEventListener('click', () => {
   apiKey = proxyUrl = proxyTok = '';
@@ -309,7 +479,11 @@ $('#btnKeyClear').addEventListener('click', () => {
   refreshMode(); setNote('設定已清除，回到 OSM 模式。');
 });
 
-/* ── 定位 ──────────────────────────────────────── */
+/* ══ 定位 ══════════════════════════════════════════ */
+let origin = null, places = [], picked = new Set(), priceSel = new Set();
+let openOnly = false, rollTimer = null, quotaNote = '';
+function setNote(m,bad){ const e=$('#locnote'); e.textContent=m; e.classList.toggle('bad',!!bad); }
+
 $('#btnGps').addEventListener('click', () => {
   if(!navigator.geolocation){ setNote('這個瀏覽器不支援定位，改用輸入地址。',true); return; }
   setNote('定位中…');
@@ -333,12 +507,11 @@ async function geocode(){
   }catch(e){ setNote('地址查詢失敗。改按「用目前位置」。',true); }
 }
 function ready(o){
-  origin = o;
-  $('#btnGo').disabled = false;
+  origin = o; $('#btnGo').disabled = false;
   setNote('定位在「'+o.label+'」。選好分類就按「找這附近」。');
 }
 
-/* ── 分類按鈕 ──────────────────────────────────── */
+/* ══ 查詢 ══════════════════════════════════════════ */
 CATS.forEach(c => {
   const b = document.createElement('button');
   b.className='chip'; b.textContent=c.label; b.setAttribute('aria-pressed','false');
@@ -358,8 +531,12 @@ PRICES.forEach(p => {
   });
   $('#priceChips').appendChild(b);
 });
+$('#chipOpen').addEventListener('click', () => {
+  openOnly = !openOnly;
+  $('#chipOpen').setAttribute('aria-pressed', openOnly);
+  render();
+});
 
-/* ── 查詢 ──────────────────────────────────────── */
 $('#btnGo').addEventListener('click', () => googleOn() ? fetchGoogle() : fetchOSM());
 $('#radius').addEventListener('input', e => $('#radiusVal').textContent = e.target.value+' m');
 
@@ -384,20 +561,15 @@ async function gpost(path, body){
   return (j.places||[]).map(gmap);
 }
 
-let quotaNote = '';
-
-/** mode: 'nearby' | 'text'。有代理走代理，否則直連 Google。 */
 async function search(mode, o){
   if(proxyUrl){
     const u = new URL(proxyUrl);
     u.searchParams.set('mode', mode);
     if(proxyTok) u.searchParams.set('token', proxyTok);
-    u.searchParams.set('lat', o.lat);
-    u.searchParams.set('lon', o.lon);
+    u.searchParams.set('lat', o.lat); u.searchParams.set('lon', o.lon);
     u.searchParams.set('radius', o.radius);
-    if(mode === 'nearby') u.searchParams.set('types', o.types.join(','));
+    if(mode==='nearby') u.searchParams.set('types', o.types.join(','));
     else u.searchParams.set('q', o.q);
-
     const res = await fetch(u.toString());
     if(!res.ok) throw new Error('代理沒回應（HTTP '+res.status+'）');
     const j = await res.json();
@@ -406,47 +578,33 @@ async function search(mode, o){
     return (j.places||[]).map(gmap);
   }
   const center = { latitude:o.lat, longitude:o.lon };
-  return mode === 'nearby'
-    ? gpost('searchNearby', {
-        includedTypes:o.types, maxResultCount:20, rankPreference:'POPULARITY',
-        languageCode:'zh-TW', regionCode:'TW',
-        locationRestriction:{ circle:{ center, radius:o.radius } } })
-    : gpost('searchText', {
-        textQuery:o.q, maxResultCount:20,
-        languageCode:'zh-TW', regionCode:'TW',
-        locationBias:{ circle:{ center, radius:o.radius } } });
+  return mode==='nearby'
+    ? gpost('searchNearby',{ includedTypes:o.types, maxResultCount:20, rankPreference:'POPULARITY',
+        languageCode:'zh-TW', regionCode:'TW', locationRestriction:{ circle:{ center, radius:o.radius } } })
+    : gpost('searchText',{ textQuery:o.q, maxResultCount:20,
+        languageCode:'zh-TW', regionCode:'TW', locationBias:{ circle:{ center, radius:o.radius } } });
 }
 
 async function fetchGoogle(){
   const radius = +$('#radius').value;
   const chosen = picked.size ? [...picked].map(id => CATS.find(c=>c.id===id)) : [];
-  const types = chosen.length
-    ? [...new Set(chosen.flatMap(c => c.gtypes || []))]
-    : ['restaurant'];
-  // 有些分類（手搖飲）Google 沒有對應的類型，只能用關鍵字另外查一次
+  const types = chosen.length ? [...new Set(chosen.flatMap(c => c.gtypes || []))] : ['restaurant'];
   const queries = chosen.filter(c => c.gquery).map(c => c.gquery);
 
   setNote(proxyUrl ? '透過代理查詢…' : '向 Google 查詢…');
-  $('#btnGo').disabled = true;
-  quotaNote = '';
-  const bag = new Map();
-  let err = null;
-
+  $('#btnGo').disabled = true; quotaNote = '';
+  const bag = new Map(); let err = null;
   try{
     if(types.length){
-      (await search('nearby', { lat:origin.lat, lon:origin.lon, radius, types }))
-        .forEach(p => bag.set(p.key, p));
+      (await search('nearby',{ lat:origin.lat, lon:origin.lon, radius, types })).forEach(p => bag.set(p.key,p));
     }
     for(const q of queries){
-      (await search('text', { lat:origin.lat, lon:origin.lon, radius, q }))
-        .forEach(p => { if(!bag.has(p.key)) bag.set(p.key, p); });
+      (await search('text',{ lat:origin.lat, lon:origin.lon, radius, q }))
+        .forEach(p => { if(!bag.has(p.key)) bag.set(p.key,p); });
     }
   }catch(e){ err = e.message; }
-
   $('#btnGo').disabled = false;
   if(err && !bag.size){ setNote(err, true); return; }
-
-  // Text Search 的 locationBias 只是偏好，會撈到範圍外的，自己再切一次
   places = [...bag.values()].filter(p => p.dist <= radius * 1.2);
   setNote(origin.label+'　回了 '+places.length+' 家'
     + (queries.length ? '（'+(1+queries.length)+' 次查詢）' : '（單次上限 20 家）')
@@ -503,40 +661,48 @@ function classifyOSM(t){
   return 'other';
 }
 
-/* ── 呈現 ──────────────────────────────────────── */
+/* ══ 結果清單 ══════════════════════════════════════ */
+const mapUrl = p => p.url || ('https://www.google.com/maps/search/'+encodeURIComponent(p.name)+'/@'+p.lat+','+p.lon+',18z');
+
+function resetRange(sel, lab){
+  const el = $(sel);
+  if(+el.value === 0) return;
+  el.value = 0; $(lab).textContent = '不限';
+}
 function visible(){
   const minR = +$('#minRate').value, minC = +$('#minCnt').value;
   return places.filter(p => {
+    if(openOnly && p.open !== true) return false;
     if(minR && (p.rating ?? 0) < minR) return false;
     if(minC && p.count < minC) return false;
     if(priceSel.size && (!p.price || !priceSel.has(p.price))) return false;
     return true;
   });
 }
-function resetRange(sel, lab){
-  const el = $(sel);
-  if(+el.value === 0) return;
-  el.value = 0;
-  $(lab).textContent = '不限';
-}
 function render(){
   const hasRating = places.some(p => p.rating != null);
   const hasPrice  = places.some(p => p.price);
+  const hasOpen   = places.some(p => p.open !== undefined);
+  const openCount = places.filter(p => p.open === true).length;
 
-  // 沒有評分／價位資料時，把對應的拉桿收起來並歸零 —— 留著只會把結果全濾光
+  // 沒有對應資料的篩選條件收起來並歸零，留著只會把結果全濾光
   if(!hasRating){ resetRange('#minRate','#minRateVal'); resetRange('#minCnt','#minCntVal'); }
   if(!hasPrice && priceSel.size){
     priceSel.clear();
     $('#priceChips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed','false'));
   }
-  $('#rowRate').hidden = $('#rowCnt').hidden = !hasRating;
+  if(!hasOpen && openOnly){ openOnly = false; $('#chipOpen').setAttribute('aria-pressed','false'); }
+
+  $('#rowOpen').hidden  = !hasOpen;
+  $('#rowRate').hidden  = $('#rowCnt').hidden = !hasRating;
   $('#rowPrice').hidden = !hasPrice;
-  const anyFilter = hasRating || hasPrice;
+  $('#openN').textContent = hasOpen ? openCount : '';
+
+  const anyFilter = hasRating || hasPrice || hasOpen;
   $('#filters').hidden = $('#filtLabel').hidden = !places.length || !anyFilter;
   $('#noFilt').hidden = !(places.length && !anyFilter);
-
   $('#warnBox').innerHTML = (googleOn() && places.length && !hasRating)
-    ? '<div class="warn">這批結果一個星等都沒回來。很可能是這把金鑰拿不到評分類的欄位（Demo Key 排除使用者產生的內容）。要用評分排序的話，得換成有結帳帳戶的一般金鑰。</div>' : '';
+    ? '<div class="warn">這批結果一個星等都沒回來。很可能是這把金鑰拿不到評分類的欄位。要用評分排序的話，得換成有結帳帳戶的一般金鑰。</div>' : '';
 
   const rows = visible();
   const mode = $('#sortBy').value;
@@ -544,44 +710,56 @@ function render(){
   else if(mode==='count') rows.sort((a,b)=>b.count-a.count || a.dist-b.dist);
   else rows.sort((a,b)=>a.dist-b.dist);
 
-  $('#cnt').textContent = rows.length ? rows.length+' 家' : '';
+  $('#cnt').textContent = rows.length ? rows.length+' 家'+(openOnly?'（營業中）':'') : '';
   $('#poolInfo').textContent = '候選 '+rows.length+' 家';
   $('#btnRoll').disabled = !rows.length;
 
   const list = $('#list');
   if(!rows.length){
     list.innerHTML = '<div class="empty">'+(places.length
-      ? '篩太緊了，把星等或評論數往回拉一點。'
+      ? (openOnly ? '這附近現在沒有營業中的店。<br>把「只看營業中」關掉，或把距離拉遠一點。'
+                  : '篩太緊了，把星等或評論數往回拉一點。')
       : '定位並按「找這附近」，結果會出現在這裡。')+'</div>';
     return;
   }
   list.innerHTML = '';
-  rows.forEach(p => {
-    const el = document.createElement('div');
-    el.className='card';
-    el.innerHTML = `
-      <div class="body">
-        <div class="nm">${esc(p.name)}</div>
-        <div class="rate">${p.rating != null
-          ? '★ '+p.rating.toFixed(1)+' <span class="cnt">('+p.count+' 則)</span>'
-          : '<span class="no">沒有評分資料</span>'}
-          ${p.price ? '　'+(PRICES.find(x=>x.id===p.price)||{}).label : ''}</div>
-        <div class="sub">
-          ${p.type ? '<span class="tag">'+esc(p.type)+'</span>' : ''}
-          ${p.open===true ? '<span class="open">營業中</span>　' : p.open===false ? '<span class="shut">休息中</span>　' : ''}
-          ${esc(p.addr)}
-        </div>
-      </div>
-      <div class="side">
-        <div class="dist">${fmtDist(p.dist)}</div>
-        <a class="mini" href="${mapUrl(p)}" target="_blank" rel="noopener">地圖</a>
-      </div>`;
-    list.appendChild(el);
-  });
+  rows.forEach(p => list.appendChild(placeCard(p)));
 }
-const mapUrl = p => p.url || ('https://www.google.com/maps/search/'+encodeURIComponent(p.name)+'/@'+p.lat+','+p.lon+',18z');
 
-/* ── 抽一家 ────────────────────────────────────── */
+function placeCard(p){
+  const el = document.createElement('div');
+  el.className = 'card';
+  const been = visitCount(p.key);
+  el.innerHTML = `
+    <div class="body">
+      <div class="nm">${esc(p.name)}</div>
+      <div class="rate">${p.rating != null
+        ? '★ '+p.rating.toFixed(1)+' <span class="cnt">('+p.count+' 則)</span>'
+        : '<span class="no">沒有評分資料</span>'}
+        ${p.price ? '　'+(PRICES.find(x=>x.id===p.price)||{}).label : ''}</div>
+      <div class="sub">
+        ${been ? '<span class="been">吃過 '+been+' 次</span>' : ''}
+        ${p.type ? '<span class="tag">'+esc(p.type)+'</span>' : ''}
+        ${p.open===true ? '<span class="open">營業中</span>　' : p.open===false ? '<span class="shut">休息中</span>　' : ''}
+        ${esc(p.addr)}
+      </div>
+    </div>
+    <div class="side">
+      <div class="dist">${fmtDist(p.dist)}</div>
+      <a class="mini" href="${mapUrl(p)}" target="_blank" rel="noopener">地圖</a>
+      <button class="mini heart ${favs.has(p.key)?'on':''}" title="收藏">♥</button>
+      <button class="mini pale" title="記一筆">記一筆</button>
+    </div>`;
+  const [heart, log] = el.querySelectorAll('.side button');
+  heart.addEventListener('click', async () => {
+    await toggleFav(p);
+    heart.classList.toggle('on', favs.has(p.key));
+  });
+  log.addEventListener('click', () => openLog(null, p));
+  return el;
+}
+
+/* ══ 抽一家 ════════════════════════════════════════ */
 $('#btnRoll').addEventListener('click', () => {
   const pool = visible();
   if(!pool.length) return;
@@ -595,22 +773,271 @@ $('#btnRoll').addEventListener('click', () => {
     if(++n >= 16){
       clearInterval(rollTimer);
       slot.classList.remove('rolling'); $('#btnRoll').disabled = false;
-      show(pool[Math.floor(Math.random()*pool.length)]);
+      showPick(pool[Math.floor(Math.random()*pool.length)]);
     }
   }, 70);
 });
-function show(p){
+function showPick(p){
+  const been = visitCount(p.key);
   $('#slot').innerHTML = `
     <div class="name">${esc(p.name)}</div>
-    <div class="meta">${p.rating != null ? '★ '+p.rating.toFixed(1)+' · ' : ''}${fmtDist(p.dist)}${p.type ? ' · '+esc(p.type) : ''}</div>
+    <div class="meta">${p.rating != null ? '★ '+p.rating.toFixed(1)+' · ' : ''}${fmtDist(p.dist)}${p.type ? ' · '+esc(p.type) : ''}${p.open===true ? ' · 營業中' : p.open===false ? ' · 休息中' : ''}${been ? ' · 吃過 '+been+' 次' : ''}</div>
     <div class="actions">
       <a class="btn" href="${mapUrl(p)}" target="_blank" rel="noopener">在地圖上看</a>
-      <button class="btn ghost" id="again">換一家</button>
+      <button class="btn ghost" id="pickFav">${favs.has(p.key)?'已收藏':'收藏'}</button>
+      <button class="btn ghost" id="pickAgain">換一家</button>
     </div>`;
-  $('#again').addEventListener('click', () => $('#btnRoll').click());
+  $('#pickAgain').addEventListener('click', () => $('#btnRoll').click());
+  $('#pickFav').addEventListener('click', async e => {
+    await toggleFav(p);
+    e.target.textContent = favs.has(p.key) ? '已收藏' : '收藏';
+  });
 }
 
-/* ── 其他 ──────────────────────────────────────── */
+/* ══ 收藏 ══════════════════════════════════════════ */
+async function toggleFav(p){
+  if(favs.has(p.key)){
+    await dbDel('favs', p.key); favs.delete(p.key);
+  }else{
+    const rec = { id:p.key, name:p.name, type:p.type||'', addr:p.addr||'',
+      lat:p.lat, lon:p.lon, url:p.url||null,
+      rating:p.rating ?? null, count:p.count||0, note:'', added:Date.now() };
+    await dbPut('favs', rec); favs.set(rec.id, rec);
+  }
+  updateBadges();
+}
+
+function renderFavs(){
+  const box = $('#favList');
+  const rows = [...favs.values()];
+  const mode = $('#favSort').value;
+  if(mode==='name') rows.sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
+  else if(mode==='rating') rows.sort((a,b)=>(b.rating??-1)-(a.rating??-1));
+  else rows.sort((a,b)=>b.added-a.added);
+
+  $('#favCnt').textContent = rows.length ? rows.length+' 家' : '';
+  if(!rows.length){
+    box.innerHTML = '<div class="empty">還沒有收藏。<br>在「找店」的結果卡片上按 ♥ 就會加進來。</div>';
+    return;
+  }
+  box.innerHTML = '';
+  rows.forEach(f => {
+    const been = visitCount(f.id);
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="body">
+        <div class="nm">${esc(f.name)}</div>
+        <div class="rate">${f.rating != null ? '★ '+f.rating.toFixed(1)+' <span class="cnt">('+f.count+' 則)</span>' : '<span class="no">沒有評分資料</span>'}</div>
+        <div class="sub">
+          ${been ? '<span class="been">吃過 '+been+' 次</span>' : ''}
+          ${f.type ? '<span class="tag">'+esc(f.type)+'</span>' : ''}${esc(f.addr)}
+        </div>
+        ${f.note ? '<div class="memo">'+esc(f.note)+'</div>' : ''}
+      </div>
+      <div class="side">
+        <a class="mini" href="${mapUrl(f)}" target="_blank" rel="noopener">地圖</a>
+        <button class="mini pale" data-a="note">${f.note?'改備註':'加備註'}</button>
+        <button class="mini pale" data-a="log">記一筆</button>
+        <button class="mini pale" data-a="del">移除</button>
+      </div>`;
+    el.querySelector('[data-a="note"]').addEventListener('click', () => openFavNote(f));
+    el.querySelector('[data-a="log"]').addEventListener('click', () => openLog(null, {key:f.id, name:f.name}));
+    el.querySelector('[data-a="del"]').addEventListener('click', async () => {
+      await dbDel('favs', f.id); favs.delete(f.id); updateBadges(); renderFavs();
+    });
+    box.appendChild(el);
+  });
+}
+$('#favSort').addEventListener('change', renderFavs);
+
+let editFav = null;
+function openFavNote(f){
+  editFav = f;
+  $('#fsTitle').textContent = f.name;
+  $('#fsNote').value = f.note || '';
+  $('#favSheet').classList.add('open');
+}
+$('#fsCancel').addEventListener('click', () => $('#favSheet').classList.remove('open'));
+$('#fsSave').addEventListener('click', async () => {
+  editFav.note = $('#fsNote').value.trim();
+  await dbPut('favs', editFav);
+  favs.set(editFav.id, editFav);
+  $('#favSheet').classList.remove('open');
+  renderFavs();
+});
+
+/* ══ 用餐記錄 ══════════════════════════════════════ */
+let editLog = null, lsPhotos = [], lsRate = 0;
+
+function openLog(existing, place){
+  editLog = existing;
+  lsPhotos = existing ? (existing.photos||[]).slice() : [];
+  lsRate = existing ? (existing.rate||0) : 0;
+  $('#lsTitle').textContent = existing ? '編輯記錄' : '記一筆';
+  $('#lsName').value = existing ? existing.name : (place ? place.name : '');
+  $('#lsDate').value = existing ? existing.date : today();
+  $('#lsNote').value = existing ? (existing.note||'') : '';
+  $('#lsDelete').hidden = !existing;
+  $('#lsName').dataset.pid = existing ? (existing.placeId||'') : (place ? place.key : '');
+  drawStars(lsRate); drawThumbs();
+  $('#logSheet').classList.add('open');
+}
+function drawStars(n){
+  lsRate = n;
+  const box = $('#lsStars');
+  box.innerHTML = '';
+  for(let i=1;i<=5;i++){
+    const b = document.createElement('button');
+    b.textContent = '★'; b.className = i<=n ? 'on' : '';
+    b.setAttribute('aria-label', i+' 星');
+    b.addEventListener('click', () => drawStars(i===n ? 0 : i));
+    box.appendChild(b);
+  }
+}
+function drawThumbs(){
+  const box = $('#lsThumbs');
+  box.innerHTML = '';
+  lsPhotos.forEach((b,i) => {
+    const d = document.createElement('div');
+    d.className = 'thumb';
+    d.innerHTML = '<img src="'+blobUrl(b)+'" alt=""><button aria-label="移除照片">×</button>';
+    d.querySelector('button').addEventListener('click', () => { lsPhotos.splice(i,1); drawThumbs(); });
+    box.appendChild(d);
+  });
+}
+/* 照片縮到最長邊 1280、JPEG 82%，不然幾張就把空間吃光 */
+async function shrink(file){
+  try{
+    const bmp = await createImageBitmap(file, { imageOrientation:'from-image' });
+    const scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width*scale), h = Math.round(bmp.height*scale);
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    c.getContext('2d').drawImage(bmp,0,0,w,h);
+    if(bmp.close) bmp.close();
+    return await new Promise(r => c.toBlob(r,'image/jpeg',0.82));
+  }catch(e){ return file; }
+}
+$('#lsAddPhoto').addEventListener('click', () => $('#lsFile').click());
+$('#lsFile').addEventListener('change', async e => {
+  const files = [...e.target.files];
+  e.target.value = '';
+  $('#lsAddPhoto').textContent = '處理中…';
+  for(const f of files) lsPhotos.push(await shrink(f));
+  $('#lsAddPhoto').textContent = '＋ 加照片';
+  drawThumbs();
+});
+$('#lsCancel').addEventListener('click', () => $('#logSheet').classList.remove('open'));
+$('#lsSave').addEventListener('click', async () => {
+  const name = $('#lsName').value.trim();
+  if(!name){ $('#lsName').focus(); return; }
+  const rec = {
+    placeId: $('#lsName').dataset.pid || '',
+    name, date: $('#lsDate').value || today(),
+    rate: lsRate, note: $('#lsNote').value.trim(), photos: lsPhotos
+  };
+  if(editLog) rec.id = editLog.id;
+  rec.id = await dbPut('logs', rec);
+  logs = logs.filter(l => l.id !== rec.id).concat([rec]);
+  updateBadges();
+  $('#logSheet').classList.remove('open');
+  renderLogs(); if(places.length) render();
+});
+$('#lsDelete').addEventListener('click', async () => {
+  if(!editLog) return;
+  await dbDel('logs', editLog.id);
+  logs = logs.filter(l => l.id !== editLog.id);
+  updateBadges();
+  $('#logSheet').classList.remove('open');
+  renderLogs(); if(places.length) render();
+});
+$('#btnNewLog').addEventListener('click', () => openLog(null, null));
+
+function renderLogs(){
+  const box = $('#logList');
+  const rows = logs.slice();
+  if($('#logSort').value === 'rate') rows.sort((a,b)=>(b.rate||0)-(a.rate||0) || b.date.localeCompare(a.date));
+  else rows.sort((a,b)=>b.date.localeCompare(a.date) || b.id-a.id);
+
+  $('#logCnt').textContent = rows.length ? rows.length+' 筆' : '';
+  if(!rows.length){
+    box.innerHTML = '<div class="empty">還沒有記錄。<br>按上面「手動新增一筆」，或在店家卡片上按「記一筆」。</div>';
+    return;
+  }
+  box.innerHTML = '';
+  rows.forEach(l => {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="body">
+        <div class="nm">${esc(l.name)}</div>
+        <div class="sub"><span class="logdate">${esc(l.date)}</span>
+          ${l.rate ? '　<span class="stars-ro">'+'★'.repeat(l.rate)+'</span>' : ''}</div>
+        ${l.note ? '<div class="memo">'+esc(l.note)+'</div>' : ''}
+        <div class="shots"></div>
+      </div>
+      <div class="side">
+        <button class="mini pale" data-a="edit">編輯</button>
+      </div>`;
+    const shots = el.querySelector('.shots');
+    (l.photos||[]).forEach(b => {
+      const img = document.createElement('img');
+      img.src = blobUrl(b); img.alt = l.name+' 的照片'; img.loading = 'lazy';
+      img.addEventListener('click', () => {
+        $('#viewerImg').src = img.src;
+        $('#viewer').classList.add('open');
+      });
+      shots.appendChild(img);
+    });
+    el.querySelector('[data-a="edit"]').addEventListener('click', () => openLog(l, null));
+    box.appendChild(el);
+  });
+}
+$('#logSort').addEventListener('change', renderLogs);
+$('#viewer').addEventListener('click', () => $('#viewer').classList.remove('open'));
+
+/* ══ 匯出／匯入 ════════════════════════════════════ */
+const toDataUrl = b => new Promise(r => { const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); });
+async function fromDataUrl(s){ return (await fetch(s)).blob(); }
+
+$('#btnExport').addEventListener('click', async () => {
+  const out = {
+    version: 1, exported: new Date().toISOString(),
+    favs: [...favs.values()],
+    logs: await Promise.all(logs.map(async l => ({
+      ...l, photos: await Promise.all((l.photos||[]).map(toDataUrl))
+    })))
+  };
+  const blob = new Blob([JSON.stringify(out)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'eatwhat-backup-'+today()+'.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+$('#btnImport').addEventListener('click', () => $('#fileIn').click());
+$('#fileIn').addEventListener('change', e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = async () => {
+    try{
+      const data = JSON.parse(rd.result);
+      for(const fav of (data.favs||[])) await dbPut('favs', fav);
+      for(const log of (data.logs||[])){
+        const rec = { ...log, photos: await Promise.all((log.photos||[]).map(fromDataUrl)) };
+        delete rec.id;                       // 拿新 id，不要蓋掉現有記錄
+        await dbPut('logs', rec);
+      }
+      await loadStore();
+      renderFavs(); renderLogs();
+      alert('匯入完成：收藏 '+(data.favs||[]).length+' 家、記錄 '+(data.logs||[]).length+' 筆。');
+    }catch(err){ alert('這個檔讀不動，要是本工具匯出的備份檔。\n'+err.message); }
+  };
+  rd.readAsText(f);
+});
+
+/* ══ 其他控制 ══════════════════════════════════════ */
 $('#sortBy').addEventListener('change', render);
 $('#minRate').addEventListener('input', e => {
   $('#minRateVal').textContent = +e.target.value ? '★ '+(+e.target.value).toFixed(1)+' 以上' : '不限';
@@ -620,12 +1047,11 @@ $('#minCnt').addEventListener('input', e => {
   $('#minCntVal').textContent = +e.target.value ? (+e.target.value)+' 則以上' : '不限';
   render();
 });
-if(PROMOS.length){
-  $('#promos').hidden = false;
-  $('#promoList').innerHTML = PROMOS.map(p =>
-    '<li>'+esc(p.text)+(p.until ? '<s>到 '+esc(p.until)+'</s>' : '')+'</li>').join('');
-}
+[$('#logSheet'), $('#favSheet')].forEach(s =>
+  s.addEventListener('click', e => { if(e.target === s) s.classList.remove('open'); }));
+
 refreshMode();
+loadStore();
 </script>
 </body>
 </html>
