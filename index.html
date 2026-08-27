@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>今天吃什麼</title>
+<style>
+:root{
+  --ink:#16211D; --ink-2:#1F2E28; --paper:#F4EFE4; --paper-dim:#DED6C6;
+  --sign-red:#D8402F; --bulb:#EBB83C; --line:rgba(244,239,228,.16);
+  --font:"PingFang TC","Noto Sans TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);color:var(--paper);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{padding:0 0 60px;line-height:1.55}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+:focus-visible{outline:2px solid var(--bulb);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+
+.sign{padding:28px 0 18px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.sign h1{font-size:clamp(28px,7.5vw,44px);font-weight:900;letter-spacing:.06em;line-height:1.05}
+.sign h1 em{font-style:normal;color:var(--bulb)}
+.mode{margin-left:auto;font-size:11.5px;letter-spacing:.12em;font-weight:800;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--paper-dim);white-space:nowrap}
+.mode.g{background:var(--bulb);color:#221A05;border-color:var(--bulb)}
+
+/* 金鑰 */
+.keybox{padding:14px 0 4px}
+.keybox summary{font-size:12.5px;color:#7d8a84;cursor:pointer;letter-spacing:.04em;list-style:none}
+.keybox summary::-webkit-details-marker{display:none}
+.keybox summary::before{content:"▸ ";color:var(--bulb)}
+.keybox[open] summary::before{content:"▾ "}
+.keybox .inner{padding:12px 0 4px;display:flex;gap:8px;flex-wrap:wrap}
+.keybox .hint{width:100%;font-size:12px;color:#6e7a74;line-height:1.75}
+
+.where{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 0}
+.where input,.keybox input{flex:1 1 190px;min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;border-radius:9px;font-size:15px}
+.where input::placeholder,.keybox input::placeholder{color:#7d8a84}
+.btn{background:var(--paper);color:var(--ink);font-weight:700;font-size:14px;padding:11px 16px;border-radius:9px;letter-spacing:.04em;white-space:nowrap;display:inline-block;text-decoration:none}
+.btn:active{transform:translateY(1px)}
+.btn.ghost{background:transparent;color:var(--paper);border:1px solid var(--line);font-weight:600}
+.btn[disabled]{opacity:.45;cursor:default}
+.locnote{width:100%;font-size:12.5px;color:var(--paper-dim);min-height:18px}
+.locnote.bad{color:#F09A8E}
+
+/* 抽籤燈箱 */
+.lightbox{margin:6px 0 20px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#20302A,#182420);border:1px solid var(--line)}
+.lightbox .bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sign-red)}
+.lightbox .bar b{font-size:14px;letter-spacing:.14em;font-weight:800}
+.lightbox .bar span{margin-left:auto;font-size:12px;opacity:.9}
+.slot{padding:22px 18px 20px;text-align:center;min-height:130px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.slot .name{font-size:clamp(21px,5.6vw,29px);font-weight:900;word-break:break-word}
+.slot .meta{font-size:13px;color:var(--paper-dim)}
+.slot .idle{font-size:14px;color:#7d8a84;letter-spacing:.05em}
+.slot.rolling .name{color:var(--bulb);opacity:.75}
+.slot .actions{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
+.roll{display:block;width:100%;background:var(--bulb);color:#221A05;font-size:17px;font-weight:900;letter-spacing:.16em;padding:16px}
+.roll[disabled]{background:#4a4a3f;color:#8d8d80}
+
+/* 分類與篩選 */
+.flabel{font-size:11.5px;letter-spacing:.2em;color:#7d8a84;font-weight:700;margin:14px 0 9px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--paper-dim)}
+.chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
+.rowline{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.rowline label{font-size:13px;color:var(--paper-dim);min-width:66px}
+.rowline input[type=range]{flex:1;accent-color:var(--sign-red)}
+.rowline b{font-size:13.5px;min-width:70px;text-align:right;color:var(--bulb)}
+.go{width:100%;background:var(--sign-red);color:#fff;font-size:15px;font-weight:800;letter-spacing:.14em;padding:14px;border-radius:10px;margin-top:12px}
+.go[disabled]{background:#4a3733;color:#9b8a86}
+
+.promos{margin:20px 0 0;border-left:3px solid var(--bulb);padding-left:14px}
+.promos h2{font-size:12px;letter-spacing:.2em;color:var(--bulb);font-weight:800;margin-bottom:8px}
+.promos li{list-style:none;font-size:14px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.promos li:last-child{border-bottom:none}
+.promos li s{color:#7d8a84;text-decoration:none;font-size:12.5px;margin-left:6px}
+
+.listhead{display:flex;align-items:baseline;gap:10px;margin-top:24px;padding:14px 0 12px;border-top:1px solid var(--line)}
+.listhead h2{font-size:13px;letter-spacing:.16em;font-weight:800}
+.listhead .cnt{font-size:12.5px;color:#7d8a84}
+.listhead select{margin-left:auto;background:var(--ink-2);color:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:13px}
+.card{background:var(--paper);color:var(--ink);border-radius:12px;padding:13px 15px;margin-bottom:9px;display:flex;gap:12px;align-items:flex-start}
+.card .body{flex:1;min-width:0}
+.card .nm{font-size:16.5px;font-weight:800;line-height:1.3;word-break:break-word}
+.card .rate{font-size:13.5px;margin-top:3px;font-weight:700;color:#8a5a1f}
+.card .rate .cnt{font-weight:400;color:#5c6660;font-size:12.5px}
+.card .rate .no{color:#9aa39d;font-weight:400}
+.card .sub{font-size:12.5px;color:#5c6660;margin-top:3px}
+.card .tag{display:inline-block;background:var(--ink);color:var(--paper);font-size:11px;padding:2px 8px;border-radius:999px;margin-right:5px}
+.card .open{color:#1E7A4B;font-weight:700}
+.card .shut{color:#B4483A;font-weight:700}
+.card .side{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.card .dist{font-size:13px;font-weight:800;color:var(--sign-red);white-space:nowrap}
+.mini{font-size:12px;font-weight:700;padding:5px 9px;border-radius:7px;background:var(--ink);color:var(--paper);white-space:nowrap;text-decoration:none}
+.empty{text-align:center;color:#7d8a84;font-size:14px;padding:34px 10px;line-height:1.9}
+.warn{background:#3A2D18;border:1px solid var(--bulb);border-radius:10px;padding:12px 14px;font-size:13px;color:#F0DFB4;margin-bottom:12px;line-height:1.7}
+.foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:#6e7a74;line-height:1.8}
+.foot a{color:var(--paper-dim)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="sign">
+    <h1>今天<em>吃什麼</em></h1>
+    <span class="mode" id="modeTag">OSM 模式</span>
+  </header>
+
+  <details class="keybox" id="keybox">
+    <summary>Google 金鑰設定</summary>
+    <div class="inner">
+      <input id="apikey" type="password" placeholder="貼上 Maps Demo Key 或一般 API key" autocomplete="off">
+      <button class="btn" id="btnKey">套用</button>
+      <button class="btn ghost" id="btnKeyClear">清除</button>
+      <div class="hint">
+        沒填 → 走 OpenStreetMap，免金鑰，有店名和類型但沒有星等。<br>
+        填了 → 走 Google Places，有星等、評論數、價格級距、營業中。<br>
+        Demo Key 到 Google Maps Platform 官網用 Google 帳號申請，不用信用卡。金鑰只留在這台裝置。
+      </div>
+    </div>
+  </details>
+
+  <div class="where">
+    <button class="btn" id="btnGps">用目前位置</button>
+    <input id="addr" placeholder="或輸入地址、地標，例如：台北車站" enterkeyhint="search">
+    <button class="btn ghost" id="btnAddr">定位</button>
+    <div class="locnote" id="locnote">先定位，再選分類。</div>
+  </div>
+
+  <section class="lightbox">
+    <div class="bar"><b>今 日 指 定</b><span id="poolInfo">候選 0 家</span></div>
+    <div class="slot" id="slot"><div class="idle">先找店，再按下面那顆按鈕</div></div>
+    <button class="roll" id="btnRoll" disabled>抽 一 家</button>
+  </section>
+
+  <div class="flabel">吃 哪 一 類（可複選，不選＝全部餐廳）</div>
+  <div class="chips" id="chips"></div>
+
+  <div class="flabel">找 多 遠</div>
+  <div class="rowline">
+    <input type="range" id="radius" min="200" max="3000" step="100" value="800">
+    <b id="radiusVal">800 m</b>
+  </div>
+  <button class="go" id="btnGo" disabled>找 這 附 近</button>
+
+  <div class="promos" id="promos" hidden>
+    <h2>本 週 優 惠</h2>
+    <ul id="promoList"></ul>
+  </div>
+
+  <div class="listhead">
+    <h2>結 果</h2>
+    <span class="cnt" id="cnt"></span>
+    <select id="sortBy">
+      <option value="rating">依評分</option>
+      <option value="dist">依距離</option>
+      <option value="count">依評論數</option>
+    </select>
+  </div>
+
+  <div class="flabel" id="filtLabel" hidden>再 篩 一 次</div>
+  <div id="filters" hidden>
+    <div class="rowline">
+      <label>最低星等</label>
+      <input type="range" id="minRate" min="0" max="4.8" step="0.1" value="0">
+      <b id="minRateVal">不限</b>
+    </div>
+    <div class="rowline">
+      <label>最少評論</label>
+      <input type="range" id="minCnt" min="0" max="500" step="10" value="0">
+      <b id="minCntVal">不限</b>
+    </div>
+    <div class="rowline">
+      <label>價位</label>
+      <div class="chips" id="priceChips" style="flex:1"></div>
+    </div>
+  </div>
+
+  <div id="warnBox"></div>
+  <div id="list"><div class="empty">定位並按「找這附近」，結果會出現在這裡。</div></div>
+
+  <footer class="foot" id="foot"></footer>
+</div>
+
+<script>
+/* ══ 本週優惠：直接改這裡 ══════════════════════════ */
+const PROMOS = [
+  // { text: "○○燒肉 平日午餐 88 折", until: "8/31" },
+];
+
+/* ══ 分類 ══════════════════════════════════════════
+   gtypes：Google Places 的 includedTypes。2026/2 那次改版補了很多，
+   火鍋、燒肉、串燒、台菜現在都有專屬類型了。
+   osm：沒有金鑰時用 cuisine 標籤 + 中文店名關鍵字判斷。
+   ════════════════════════════════════════════════ */
+const CATS = [
+  { id:'bbq', label:'燒烤',
+    gtypes:['barbecue_restaurant','yakiniku_restaurant','korean_barbecue_restaurant','yakitori_restaurant','mongolian_barbecue_restaurant'],
+    cuisine:/barbecue|bbq|yakiniku|grill/i, kw:/燒烤|燒肉|烤肉|串燒|炭烤|燒鳥|鐵板燒/ },
+  { id:'hot', label:'火鍋',
+    gtypes:['hot_pot_restaurant'],
+    cuisine:/hot_?pot|shabu|sukiyaki|steamboat/i, kw:/火鍋|鍋物|涮涮|麻辣鍋|薑母鴨|羊肉爐|石頭鍋/ },
+  { id:'kr', label:'韓式',
+    gtypes:['korean_restaurant','korean_barbecue_restaurant'],
+    cuisine:/korean/i, kw:/韓式|韓國|部隊鍋|馬鈴薯排骨|Korea/i },
+  { id:'it', label:'義式',
+    gtypes:['italian_restaurant','pizza_restaurant'],
+    cuisine:/italian|pizza|pasta/i, kw:/義大利|義式|披薩|比薩|Pizza|Pasta|燉飯/i },
+  { id:'fast', label:'速食',
+    gtypes:['fast_food_restaurant','hamburger_restaurant','chicken_restaurant','sandwich_shop'],
+    cuisine:/burger|fried_chicken|sandwich|fast_food/i, amenity:/fast_food/,
+    kw:/麥當勞|肯德基|摩斯|漢堡|速食|炸雞|Subway|McDonald|KFC|Burger/i },
+  { id:'jp', label:'日式',
+    gtypes:['japanese_restaurant','ramen_restaurant','sushi_restaurant','japanese_izakaya_restaurant','tonkatsu_restaurant','japanese_curry_restaurant'],
+    cuisine:/japanese|sushi|ramen|udon|donburi|izakaya/i, kw:/日式|壽司|拉麵|烏龍麵|丼|定食|居酒屋|豬排/ },
+  { id:'tw', label:'台菜小吃',
+    gtypes:['taiwanese_restaurant','chinese_restaurant','noodle_shop','chinese_noodle_restaurant','dumpling_restaurant','dim_sum_restaurant'],
+    cuisine:/chinese|taiwanese|asian|dumpling|noodle/i,
+    kw:/熱炒|快炒|台菜|小吃|滷肉飯|雞肉飯|便當|自助餐|麵店|水餃|牛肉麵|米粉|羹/ },
+  { id:'cafe', label:'咖啡早午餐',
+    gtypes:['cafe','coffee_shop','brunch_restaurant','breakfast_restaurant','bakery'],
+    cuisine:/coffee|cafe|breakfast|brunch|bakery/i, amenity:/cafe/,
+    kw:/咖啡|早午餐|早餐|吐司|Cafe|Coffee|Brunch|烘焙/i },
+];
+
+const PRICES = [
+  { id:'PRICE_LEVEL_INEXPENSIVE', label:'$' },
+  { id:'PRICE_LEVEL_MODERATE',    label:'$$' },
+  { id:'PRICE_LEVEL_EXPENSIVE',   label:'$$$' },
+  { id:'PRICE_LEVEL_VERY_EXPENSIVE', label:'$$$$' },
+];
+
+const OVERPASS = ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter'];
+const FIELDS = ['places.id','places.displayName','places.formattedAddress','places.location',
+  'places.rating','places.userRatingCount','places.priceLevel','places.primaryTypeDisplayName',
+  'places.currentOpeningHours.openNow','places.googleMapsUri'].join(',');
+
+let apiKey = store('get','eatwhat.key') || '';
+let origin = null, places = [], picked = new Set(), priceSel = new Set(), rollTimer = null;
+const $ = s => document.querySelector(s);
+
+function store(op, k, v){
+  try{ if(op==='get') return localStorage.getItem(k);
+       if(op==='set') localStorage.setItem(k,v);
+       if(op==='del') localStorage.removeItem(k); }catch(e){ return null; }
+}
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmtDist = m => m<1000 ? Math.round(m)+' m' : (m/1000).toFixed(1)+' km';
+function distance(a,b){
+  const R=6371000, rad=d=>d*Math.PI/180;
+  const dLat=rad(b.lat-a.lat), dLon=rad(b.lon-a.lon);
+  const x=Math.sin(dLat/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dLon/2)**2;
+  return 2*R*Math.asin(Math.sqrt(x));
+}
+function setNote(m,bad){ const e=$('#locnote'); e.textContent=m; e.classList.toggle('bad',!!bad); }
+
+/* ── 模式 ──────────────────────────────────────── */
+function refreshMode(){
+  const g = !!apiKey;
+  $('#modeTag').textContent = g ? 'Google 模式' : 'OSM 模式';
+  $('#modeTag').classList.toggle('g', g);
+  $('#sortBy').value = g ? 'rating' : 'dist';
+  $('#foot').innerHTML = g
+    ? '店家資料與評分來自 Google 地圖。星等和評論數為 Google 使用者所評，非本工具產生。'
+    : '店家資料 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者。這個模式沒有星等，點「地圖」可以到 Google 上看評價。';
+}
+$('#btnKey').addEventListener('click', () => {
+  const k = $('#apikey').value.trim();
+  if(!k){ setNote('金鑰是空的。',true); return; }
+  apiKey = k; store('set','eatwhat.key',k);
+  $('#apikey').value=''; $('#keybox').open=false;
+  refreshMode(); setNote('已切到 Google 模式。按「找這附近」試試。');
+});
+$('#btnKeyClear').addEventListener('click', () => {
+  apiKey=''; store('del','eatwhat.key'); $('#apikey').value='';
+  refreshMode(); setNote('金鑰已清除，回到 OSM 模式。');
+});
+
+/* ── 定位 ──────────────────────────────────────── */
+$('#btnGps').addEventListener('click', () => {
+  if(!navigator.geolocation){ setNote('這個瀏覽器不支援定位，改用輸入地址。',true); return; }
+  setNote('定位中…');
+  navigator.geolocation.getCurrentPosition(
+    p => ready({lat:p.coords.latitude, lon:p.coords.longitude, label:'目前位置'}),
+    () => setNote('拿不到位置。可能沒開權限，或網頁不是 https — 改用輸入地址一樣可以。',true),
+    {enableHighAccuracy:true, timeout:10000});
+});
+$('#btnAddr').addEventListener('click', geocode);
+$('#addr').addEventListener('keydown', e => { if(e.key==='Enter') geocode(); });
+
+async function geocode(){
+  const q = $('#addr').value.trim();
+  if(!q){ setNote('先打個地點名稱。',true); return; }
+  setNote('找「'+q+'」…');
+  try{
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-TW&q='+encodeURIComponent(q));
+    const j = await r.json();
+    if(!j.length){ setNote('找不到「'+q+'」。加上縣市再試一次。',true); return; }
+    ready({lat:+j[0].lat, lon:+j[0].lon, label:j[0].display_name.split(',')[0]});
+  }catch(e){ setNote('地址查詢失敗。改按「用目前位置」。',true); }
+}
+function ready(o){
+  origin = o;
+  $('#btnGo').disabled = false;
+  setNote('定位在「'+o.label+'」。選好分類就按「找這附近」。');
+}
+
+/* ── 分類按鈕 ──────────────────────────────────── */
+CATS.forEach(c => {
+  const b = document.createElement('button');
+  b.className='chip'; b.textContent=c.label; b.setAttribute('aria-pressed','false');
+  b.addEventListener('click', () => {
+    picked.has(c.id) ? picked.delete(c.id) : picked.add(c.id);
+    b.setAttribute('aria-pressed', picked.has(c.id));
+  });
+  $('#chips').appendChild(b);
+});
+PRICES.forEach(p => {
+  const b = document.createElement('button');
+  b.className='chip'; b.textContent=p.label; b.setAttribute('aria-pressed','false');
+  b.addEventListener('click', () => {
+    priceSel.has(p.id) ? priceSel.delete(p.id) : priceSel.add(p.id);
+    b.setAttribute('aria-pressed', priceSel.has(p.id));
+    render();
+  });
+  $('#priceChips').appendChild(b);
+});
+
+/* ── 查詢 ──────────────────────────────────────── */
+$('#btnGo').addEventListener('click', () => apiKey ? fetchGoogle() : fetchOSM());
+$('#radius').addEventListener('input', e => $('#radiusVal').textContent = e.target.value+' m');
+
+async function fetchGoogle(){
+  const radius = +$('#radius').value;
+  const types = picked.size
+    ? [...new Set([...picked].flatMap(id => CATS.find(c=>c.id===id).gtypes))]
+    : ['restaurant'];
+  setNote('向 Google 查詢…');
+  $('#btnGo').disabled = true;
+
+  try{
+    const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'X-Goog-Api-Key':apiKey, 'X-Goog-FieldMask':FIELDS },
+      body: JSON.stringify({
+        includedTypes: types,
+        maxResultCount: 20,
+        rankPreference: 'POPULARITY',
+        languageCode: 'zh-TW',
+        regionCode: 'TW',
+        locationRestriction: { circle:{ center:{ latitude:origin.lat, longitude:origin.lon }, radius } }
+      })
+    });
+    const j = await res.json();
+    if(!res.ok){
+      setNote('Google 回了錯誤：'+(j.error?.message || res.status)+'（金鑰權限、額度、或這個欄位 Demo Key 不給）', true);
+      $('#btnGo').disabled=false; return;
+    }
+    places = (j.places||[]).map(p => ({
+      key:p.id, name:p.displayName?.text || '(無名)',
+      rating:p.rating ?? null, count:p.userRatingCount ?? 0,
+      price:p.priceLevel || null, type:p.primaryTypeDisplayName?.text || '',
+      open:p.currentOpeningHours?.openNow, addr:p.formattedAddress || '',
+      url:p.googleMapsUri || null,
+      lat:p.location.latitude, lon:p.location.longitude,
+      dist:distance(origin,{lat:p.location.latitude,lon:p.location.longitude}),
+    }));
+    setNote(origin.label+'　Google 回了 '+places.length+' 家（單次上限 20 家）');
+    render();
+  }catch(e){
+    setNote('連不上 Google Places（'+e+'）。檢查金鑰有沒有啟用 Places API (New)。', true);
+  }
+  $('#btnGo').disabled = false;
+}
+
+async function fetchOSM(){
+  const r = +$('#radius').value;
+  setNote('在「'+origin.label+'」'+fmtDist(r)+' 內找店…');
+  $('#btnGo').disabled = true;
+  const q = `[out:json][timeout:30];
+(node["amenity"~"^(restaurant|fast_food|cafe)$"](around:${r},${origin.lat},${origin.lon});
+ way["amenity"~"^(restaurant|fast_food|cafe)$"](around:${r},${origin.lat},${origin.lon}););
+out center tags 300;`;
+  let data=null, err=null;
+  for(const ep of OVERPASS){
+    try{
+      const res = await fetch(ep,{method:'POST',body:'data='+encodeURIComponent(q),
+        headers:{'Content-Type':'application/x-www-form-urlencoded'}});
+      if(!res.ok) throw new Error(res.status);
+      data = await res.json(); break;
+    }catch(e){ err=e; }
+  }
+  $('#btnGo').disabled = false;
+  if(!data){ setNote('Overpass 沒回應（'+err+'）。等十幾秒再按一次。',true); return; }
+
+  const all = (data.elements||[]).map(el => {
+    const t = el.tags||{}, lat = el.lat ?? el.center?.lat, lon = el.lon ?? el.center?.lon;
+    if(!t.name || lat==null) return null;
+    const cat = classifyOSM(t);
+    return { key:el.type+'/'+el.id, name:t.name, rating:null, count:0, price:null,
+      type:(CATS.find(c=>c.id===cat)||{}).label || '其他', open:undefined,
+      addr:[t['addr:city'],t['addr:district'],t['addr:street'],t['addr:housenumber']].filter(Boolean).join(''),
+      url:null, cat, lat, lon, dist:distance(origin,{lat,lon}) };
+  }).filter(Boolean);
+
+  places = picked.size ? all.filter(p => picked.has(p.cat)) : all;
+  setNote(origin.label+'　找到 '+places.length+' 家' + (picked.size ? '（已依分類篩選）' : ''));
+  render();
+}
+
+function classifyOSM(t){
+  const name = (t.name||'')+' '+(t['name:zh']||'')+' '+(t['name:en']||'');
+  const cu = t.cuisine||'', am = t.amenity||'';
+  for(const c of CATS){
+    if(c.cuisine && c.cuisine.test(cu)) return c.id;
+    if(c.amenity && c.amenity.test(am) && !cu) return c.id;
+    if(c.kw && c.kw.test(name)) return c.id;
+  }
+  return 'other';
+}
+
+/* ── 呈現 ──────────────────────────────────────── */
+function visible(){
+  const minR = +$('#minRate').value, minC = +$('#minCnt').value;
+  return places.filter(p => {
+    if(minR && (p.rating ?? 0) < minR) return false;
+    if(minC && p.count < minC) return false;
+    if(priceSel.size && (!p.price || !priceSel.has(p.price))) return false;
+    return true;
+  });
+}
+function render(){
+  const hasRating = places.some(p => p.rating != null);
+  $('#filters').hidden = $('#filtLabel').hidden = !places.length;
+  $('#warnBox').innerHTML = (apiKey && places.length && !hasRating)
+    ? '<div class="warn">這批結果一個星等都沒回來。很可能是這把金鑰拿不到評分類的欄位（Demo Key 排除使用者產生的內容）。要用評分排序的話，得換成有結帳帳戶的一般金鑰。</div>' : '';
+
+  const rows = visible();
+  const mode = $('#sortBy').value;
+  if(mode==='rating') rows.sort((a,b)=>(b.rating??-1)-(a.rating??-1) || b.count-a.count);
+  else if(mode==='count') rows.sort((a,b)=>b.count-a.count || a.dist-b.dist);
+  else rows.sort((a,b)=>a.dist-b.dist);
+
+  $('#cnt').textContent = rows.length ? rows.length+' 家' : '';
+  $('#poolInfo').textContent = '候選 '+rows.length+' 家';
+  $('#btnRoll').disabled = !rows.length;
+
+  const list = $('#list');
+  if(!rows.length){
+    list.innerHTML = '<div class="empty">'+(places.length
+      ? '篩太緊了，把星等或評論數往回拉一點。'
+      : '定位並按「找這附近」，結果會出現在這裡。')+'</div>';
+    return;
+  }
+  list.innerHTML = '';
+  rows.forEach(p => {
+    const el = document.createElement('div');
+    el.className='card';
+    el.innerHTML = `
+      <div class="body">
+        <div class="nm">${esc(p.name)}</div>
+        <div class="rate">${p.rating != null
+          ? '★ '+p.rating.toFixed(1)+' <span class="cnt">('+p.count+' 則)</span>'
+          : '<span class="no">沒有評分資料</span>'}
+          ${p.price ? '　'+(PRICES.find(x=>x.id===p.price)||{}).label : ''}</div>
+        <div class="sub">
+          ${p.type ? '<span class="tag">'+esc(p.type)+'</span>' : ''}
+          ${p.open===true ? '<span class="open">營業中</span>　' : p.open===false ? '<span class="shut">休息中</span>　' : ''}
+          ${esc(p.addr)}
+        </div>
+      </div>
+      <div class="side">
+        <div class="dist">${fmtDist(p.dist)}</div>
+        <a class="mini" href="${mapUrl(p)}" target="_blank" rel="noopener">地圖</a>
+      </div>`;
+    list.appendChild(el);
+  });
+}
+const mapUrl = p => p.url || ('https://www.google.com/maps/search/'+encodeURIComponent(p.name)+'/@'+p.lat+','+p.lon+',18z');
+
+/* ── 抽一家 ────────────────────────────────────── */
+$('#btnRoll').addEventListener('click', () => {
+  const pool = visible();
+  if(!pool.length) return;
+  clearInterval(rollTimer);
+  const slot = $('#slot');
+  slot.classList.add('rolling'); $('#btnRoll').disabled = true;
+  let n = 0;
+  rollTimer = setInterval(() => {
+    const p = pool[Math.floor(Math.random()*pool.length)];
+    slot.innerHTML = '<div class="name">'+esc(p.name)+'</div><div class="meta">　</div>';
+    if(++n >= 16){
+      clearInterval(rollTimer);
+      slot.classList.remove('rolling'); $('#btnRoll').disabled = false;
+      show(pool[Math.floor(Math.random()*pool.length)]);
+    }
+  }, 70);
+});
+function show(p){
+  $('#slot').innerHTML = `
+    <div class="name">${esc(p.name)}</div>
+    <div class="meta">${p.rating != null ? '★ '+p.rating.toFixed(1)+' · ' : ''}${fmtDist(p.dist)}${p.type ? ' · '+esc(p.type) : ''}</div>
+    <div class="actions">
+      <a class="btn" href="${mapUrl(p)}" target="_blank" rel="noopener">在地圖上看</a>
+      <button class="btn ghost" id="again">換一家</button>
+    </div>`;
+  $('#again').addEventListener('click', () => $('#btnRoll').click());
+}
+
+/* ── 其他 ──────────────────────────────────────── */
+$('#sortBy').addEventListener('change', render);
+$('#minRate').addEventListener('input', e => {
+  $('#minRateVal').textContent = +e.target.value ? '★ '+(+e.target.value).toFixed(1)+' 以上' : '不限';
+  render();
+});
+$('#minCnt').addEventListener('input', e => {
+  $('#minCntVal').textContent = +e.target.value ? (+e.target.value)+' 則以上' : '不限';
+  render();
+});
+if(PROMOS.length){
+  $('#promos').hidden = false;
+  $('#promoList').innerHTML = PROMOS.map(p =>
+    '<li>'+esc(p.text)+(p.until ? '<s>到 '+esc(p.until)+'</s>' : '')+'</li>').join('');
+}
+refreshMode();
+</script>
+</body>
+</html>
