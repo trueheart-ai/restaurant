@@ -63,6 +63,8 @@ input,select{font-family:inherit}
 .chip{border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:14px;color:var(--paper-dim)}
 .chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
 .rowline{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.rowline[hidden]{display:none}
+.nodata{font-size:12.5px;color:#6e7a74;padding:2px 0 6px;line-height:1.7}
 .rowline label{font-size:13px;color:var(--paper-dim);min-width:66px}
 .rowline input[type=range]{flex:1;accent-color:var(--sign-red)}
 .rowline b{font-size:13.5px;min-width:70px;text-align:right;color:var(--bulb)}
@@ -108,15 +110,19 @@ input,select{font-family:inherit}
   </header>
 
   <details class="keybox" id="keybox">
-    <summary>Google 金鑰設定</summary>
+    <summary>連線設定</summary>
     <div class="inner">
-      <input id="apikey" type="password" placeholder="貼上 Maps Demo Key 或一般 API key" autocomplete="off">
+      <input id="proxyUrl" placeholder="Apps Script 代理網址（.../exec）" autocomplete="off">
+      <input id="proxyToken" placeholder="通行碼" autocomplete="off" style="flex:0 1 150px">
+      <input id="apikey" type="password" placeholder="或直接貼 Google API 金鑰" autocomplete="off">
       <button class="btn" id="btnKey">套用</button>
       <button class="btn ghost" id="btnKeyClear">清除</button>
       <div class="hint">
-        沒填 → 走 OpenStreetMap，免金鑰，有店名和類型但沒有星等。<br>
-        填了 → 走 Google Places，有星等、評論數、價格級距、營業中。<br>
-        Demo Key 到 Google Maps Platform 官網用 Google 帳號申請，不用信用卡。金鑰只留在這台裝置。
+        三種來源，由上往下優先：<br>
+        <b>代理</b> — 金鑰在 Apps Script 那端，這台裝置看不到。分享給別人用這個。<br>
+        <b>金鑰</b> — 直接從瀏覽器打 Google。自己測試用。<br>
+        <b>都不填</b> — 走 OpenStreetMap，免金鑰，但沒有星等。<br>
+        填的東西只留在這台裝置的瀏覽器裡。
       </div>
     </div>
   </details>
@@ -161,33 +167,39 @@ input,select{font-family:inherit}
 
   <div class="flabel" id="filtLabel" hidden>再 篩 一 次</div>
   <div id="filters" hidden>
-    <div class="rowline">
+    <div class="rowline" id="rowRate">
       <label>最低星等</label>
       <input type="range" id="minRate" min="0" max="4.8" step="0.1" value="0">
       <b id="minRateVal">不限</b>
     </div>
-    <div class="rowline">
+    <div class="rowline" id="rowCnt">
       <label>最少評論</label>
       <input type="range" id="minCnt" min="0" max="500" step="10" value="0">
       <b id="minCntVal">不限</b>
     </div>
-    <div class="rowline">
+    <div class="rowline" id="rowPrice">
       <label>價位</label>
       <div class="chips" id="priceChips" style="flex:1"></div>
     </div>
   </div>
 
+  <div class="nodata" id="noFilt" hidden>這批結果沒有評分或價位資料，所以沒有可篩的條件。要按星等篩，得填 Google 金鑰。</div>
   <div id="warnBox"></div>
   <div id="list"><div class="empty">定位並按「找這附近」，結果會出現在這裡。</div></div>
 
   <footer class="foot" id="foot"></footer>
 </div>
 
+<script src="config.js"></script>
 <script>
-/* ══ 本週優惠：直接改這裡 ══════════════════════════ */
-const PROMOS = [
-  // { text: "○○燒肉 平日午餐 88 折", until: "8/31" },
-];
+/* 設定從旁邊的 config.js 讀，這個檔案不放任何網址或通行碼。
+   config.js 不存在也沒關係，會退回「連線設定」手動輸入。 */
+const CFG = (typeof window !== 'undefined' && window.EATWHAT_CONFIG) || {};
+const PROXY_URL   = CFG.proxyUrl   || '';
+const PROXY_TOKEN = CFG.proxyToken || '';
+
+/* 本週優惠也放 config.js，這樣改優惠不用動這個檔 */
+const PROMOS = CFG.promos || [];
 
 /* ══ 分類 ══════════════════════════════════════════
    gtypes：Google Places 的 includedTypes。2026/2 那次改版補了很多，
@@ -218,6 +230,13 @@ const CATS = [
     gtypes:['taiwanese_restaurant','chinese_restaurant','noodle_shop','chinese_noodle_restaurant','dumpling_restaurant','dim_sum_restaurant'],
     cuisine:/chinese|taiwanese|asian|dumpling|noodle/i,
     kw:/熱炒|快炒|台菜|小吃|滷肉飯|雞肉飯|便當|自助餐|麵店|水餃|牛肉麵|米粉|羹/ },
+  { id:'vn', label:'越式',
+    gtypes:['vietnamese_restaurant'],
+    cuisine:/vietnamese/i, kw:/越式|越南|河粉|法國麵包|Pho|Vietnam/i },
+  { id:'drink', label:'手搖飲',
+    gtypes:['tea_house','juice_shop'], gquery:'手搖飲料店',
+    cuisine:/bubble_tea|boba|tea|juice|smoothie/i, shop:/bubble_tea|beverages|tea/,
+    kw:/手搖|茶飲|飲料|奶茶|珍珠|鮮奶茶|清心|五十嵐|50嵐|迷客夏|麻古|大苑子|可不可|茶湯會|龜記|CoCo|COMEBUY|Chatime|一沐日|得正/i },
   { id:'cafe', label:'咖啡早午餐',
     gtypes:['cafe','coffee_shop','brunch_restaurant','breakfast_restaurant','bakery'],
     cuisine:/coffee|cafe|breakfast|brunch|bakery/i, amenity:/cafe/,
@@ -236,8 +255,11 @@ const FIELDS = ['places.id','places.displayName','places.formattedAddress','plac
   'places.rating','places.userRatingCount','places.priceLevel','places.primaryTypeDisplayName',
   'places.currentOpeningHours.openNow','places.googleMapsUri'].join(',');
 
-let apiKey = store('get','eatwhat.key') || '';
+let apiKey    = store('get','eatwhat.key')   || '';
+let proxyUrl  = store('get','eatwhat.proxy') || PROXY_URL;
+let proxyTok  = store('get','eatwhat.tok')   || PROXY_TOKEN;
 let origin = null, places = [], picked = new Set(), priceSel = new Set(), rollTimer = null;
+const googleOn = () => !!(proxyUrl || apiKey);
 const $ = s => document.querySelector(s);
 
 function store(op, k, v){
@@ -257,8 +279,8 @@ function setNote(m,bad){ const e=$('#locnote'); e.textContent=m; e.classList.tog
 
 /* ── 模式 ──────────────────────────────────────── */
 function refreshMode(){
-  const g = !!apiKey;
-  $('#modeTag').textContent = g ? 'Google 模式' : 'OSM 模式';
+  const g = googleOn();
+  $('#modeTag').textContent = proxyUrl ? '代理模式' : apiKey ? 'Google 模式' : 'OSM 模式';
   $('#modeTag').classList.toggle('g', g);
   $('#sortBy').value = g ? 'rating' : 'dist';
   $('#foot').innerHTML = g
@@ -266,15 +288,25 @@ function refreshMode(){
     : '店家資料 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者。這個模式沒有星等，點「地圖」可以到 Google 上看評價。';
 }
 $('#btnKey').addEventListener('click', () => {
-  const k = $('#apikey').value.trim();
-  if(!k){ setNote('金鑰是空的。',true); return; }
-  apiKey = k; store('set','eatwhat.key',k);
-  $('#apikey').value=''; $('#keybox').open=false;
-  refreshMode(); setNote('已切到 Google 模式。按「找這附近」試試。');
+  const u = $('#proxyUrl').value.trim(), t = $('#proxyToken').value.trim(), k = $('#apikey').value.trim();
+  if(!u && !k){ setNote('代理網址和金鑰至少要填一個。',true); return; }
+  if(u){
+    if(!/^https:\/\/script\.google\.com\/.*\/exec$/.test(u)){
+      setNote('代理網址看起來不對，應該是 script.google.com 開頭、/exec 結尾的那一串。',true); return;
+    }
+    proxyUrl = u; proxyTok = t;
+    store('set','eatwhat.proxy',u); store('set','eatwhat.tok',t);
+  }
+  if(k){ apiKey = k; store('set','eatwhat.key',k); }
+  $('#apikey').value = ''; $('#proxyToken').value = ''; $('#keybox').open = false;
+  refreshMode();
+  setNote(proxyUrl ? '已切到代理模式。按「找這附近」試試。' : '已切到 Google 模式。按「找這附近」試試。');
 });
 $('#btnKeyClear').addEventListener('click', () => {
-  apiKey=''; store('del','eatwhat.key'); $('#apikey').value='';
-  refreshMode(); setNote('金鑰已清除，回到 OSM 模式。');
+  apiKey = proxyUrl = proxyTok = '';
+  ['eatwhat.key','eatwhat.proxy','eatwhat.tok'].forEach(k => store('del',k));
+  $('#apikey').value = $('#proxyUrl').value = $('#proxyToken').value = '';
+  refreshMode(); setNote('設定已清除，回到 OSM 模式。');
 });
 
 /* ── 定位 ──────────────────────────────────────── */
@@ -328,50 +360,98 @@ PRICES.forEach(p => {
 });
 
 /* ── 查詢 ──────────────────────────────────────── */
-$('#btnGo').addEventListener('click', () => apiKey ? fetchGoogle() : fetchOSM());
+$('#btnGo').addEventListener('click', () => googleOn() ? fetchGoogle() : fetchOSM());
 $('#radius').addEventListener('input', e => $('#radiusVal').textContent = e.target.value+' m');
+
+const gmap = p => ({
+  key:p.id, name:p.displayName?.text || '(無名)',
+  rating:p.rating ?? null, count:p.userRatingCount ?? 0,
+  price:p.priceLevel || null, type:p.primaryTypeDisplayName?.text || '',
+  open:p.currentOpeningHours?.openNow, addr:p.formattedAddress || '',
+  url:p.googleMapsUri || null,
+  lat:p.location.latitude, lon:p.location.longitude,
+  dist:distance(origin,{lat:p.location.latitude,lon:p.location.longitude}),
+});
+
+async function gpost(path, body){
+  const res = await fetch('https://places.googleapis.com/v1/places:'+path, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'X-Goog-Api-Key':apiKey, 'X-Goog-FieldMask':FIELDS },
+    body: JSON.stringify(body)
+  });
+  const j = await res.json();
+  if(!res.ok) throw new Error(j.error?.message || ('HTTP '+res.status));
+  return (j.places||[]).map(gmap);
+}
+
+let quotaNote = '';
+
+/** mode: 'nearby' | 'text'。有代理走代理，否則直連 Google。 */
+async function search(mode, o){
+  if(proxyUrl){
+    const u = new URL(proxyUrl);
+    u.searchParams.set('mode', mode);
+    if(proxyTok) u.searchParams.set('token', proxyTok);
+    u.searchParams.set('lat', o.lat);
+    u.searchParams.set('lon', o.lon);
+    u.searchParams.set('radius', o.radius);
+    if(mode === 'nearby') u.searchParams.set('types', o.types.join(','));
+    else u.searchParams.set('q', o.q);
+
+    const res = await fetch(u.toString());
+    if(!res.ok) throw new Error('代理沒回應（HTTP '+res.status+'）');
+    const j = await res.json();
+    if(j.error) throw new Error(j.error);
+    if(j.dailyLimit) quotaNote = '　今日已用 '+j.usedToday+'/'+j.dailyLimit;
+    return (j.places||[]).map(gmap);
+  }
+  const center = { latitude:o.lat, longitude:o.lon };
+  return mode === 'nearby'
+    ? gpost('searchNearby', {
+        includedTypes:o.types, maxResultCount:20, rankPreference:'POPULARITY',
+        languageCode:'zh-TW', regionCode:'TW',
+        locationRestriction:{ circle:{ center, radius:o.radius } } })
+    : gpost('searchText', {
+        textQuery:o.q, maxResultCount:20,
+        languageCode:'zh-TW', regionCode:'TW',
+        locationBias:{ circle:{ center, radius:o.radius } } });
+}
 
 async function fetchGoogle(){
   const radius = +$('#radius').value;
-  const types = picked.size
-    ? [...new Set([...picked].flatMap(id => CATS.find(c=>c.id===id).gtypes))]
+  const chosen = picked.size ? [...picked].map(id => CATS.find(c=>c.id===id)) : [];
+  const types = chosen.length
+    ? [...new Set(chosen.flatMap(c => c.gtypes || []))]
     : ['restaurant'];
-  setNote('向 Google 查詢…');
+  // 有些分類（手搖飲）Google 沒有對應的類型，只能用關鍵字另外查一次
+  const queries = chosen.filter(c => c.gquery).map(c => c.gquery);
+
+  setNote(proxyUrl ? '透過代理查詢…' : '向 Google 查詢…');
   $('#btnGo').disabled = true;
+  quotaNote = '';
+  const bag = new Map();
+  let err = null;
 
   try{
-    const res = await fetch('https://places.googleapis.com/v1/places:searchNearby', {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'X-Goog-Api-Key':apiKey, 'X-Goog-FieldMask':FIELDS },
-      body: JSON.stringify({
-        includedTypes: types,
-        maxResultCount: 20,
-        rankPreference: 'POPULARITY',
-        languageCode: 'zh-TW',
-        regionCode: 'TW',
-        locationRestriction: { circle:{ center:{ latitude:origin.lat, longitude:origin.lon }, radius } }
-      })
-    });
-    const j = await res.json();
-    if(!res.ok){
-      setNote('Google 回了錯誤：'+(j.error?.message || res.status)+'（金鑰權限、額度、或這個欄位 Demo Key 不給）', true);
-      $('#btnGo').disabled=false; return;
+    if(types.length){
+      (await search('nearby', { lat:origin.lat, lon:origin.lon, radius, types }))
+        .forEach(p => bag.set(p.key, p));
     }
-    places = (j.places||[]).map(p => ({
-      key:p.id, name:p.displayName?.text || '(無名)',
-      rating:p.rating ?? null, count:p.userRatingCount ?? 0,
-      price:p.priceLevel || null, type:p.primaryTypeDisplayName?.text || '',
-      open:p.currentOpeningHours?.openNow, addr:p.formattedAddress || '',
-      url:p.googleMapsUri || null,
-      lat:p.location.latitude, lon:p.location.longitude,
-      dist:distance(origin,{lat:p.location.latitude,lon:p.location.longitude}),
-    }));
-    setNote(origin.label+'　Google 回了 '+places.length+' 家（單次上限 20 家）');
-    render();
-  }catch(e){
-    setNote('連不上 Google Places（'+e+'）。檢查金鑰有沒有啟用 Places API (New)。', true);
-  }
+    for(const q of queries){
+      (await search('text', { lat:origin.lat, lon:origin.lon, radius, q }))
+        .forEach(p => { if(!bag.has(p.key)) bag.set(p.key, p); });
+    }
+  }catch(e){ err = e.message; }
+
   $('#btnGo').disabled = false;
+  if(err && !bag.size){ setNote(err, true); return; }
+
+  // Text Search 的 locationBias 只是偏好，會撈到範圍外的，自己再切一次
+  places = [...bag.values()].filter(p => p.dist <= radius * 1.2);
+  setNote(origin.label+'　回了 '+places.length+' 家'
+    + (queries.length ? '（'+(1+queries.length)+' 次查詢）' : '（單次上限 20 家）')
+    + quotaNote + (err ? '　部分查詢失敗：'+err : ''));
+  render();
 }
 
 async function fetchOSM(){
@@ -380,8 +460,10 @@ async function fetchOSM(){
   $('#btnGo').disabled = true;
   const q = `[out:json][timeout:30];
 (node["amenity"~"^(restaurant|fast_food|cafe)$"](around:${r},${origin.lat},${origin.lon});
- way["amenity"~"^(restaurant|fast_food|cafe)$"](around:${r},${origin.lat},${origin.lon}););
-out center tags 300;`;
+ way["amenity"~"^(restaurant|fast_food|cafe)$"](around:${r},${origin.lat},${origin.lon});
+ node["shop"~"^(bubble_tea|beverages|tea)$"](around:${r},${origin.lat},${origin.lon});
+ way["shop"~"^(bubble_tea|beverages|tea)$"](around:${r},${origin.lat},${origin.lon}););
+out center tags 400;`;
   let data=null, err=null;
   for(const ep of OVERPASS){
     try{
@@ -411,8 +493,9 @@ out center tags 300;`;
 
 function classifyOSM(t){
   const name = (t.name||'')+' '+(t['name:zh']||'')+' '+(t['name:en']||'');
-  const cu = t.cuisine||'', am = t.amenity||'';
+  const cu = t.cuisine||'', am = t.amenity||'', sh = t.shop||'';
   for(const c of CATS){
+    if(c.shop && sh && c.shop.test(sh)) return c.id;
     if(c.cuisine && c.cuisine.test(cu)) return c.id;
     if(c.amenity && c.amenity.test(am) && !cu) return c.id;
     if(c.kw && c.kw.test(name)) return c.id;
@@ -430,10 +513,29 @@ function visible(){
     return true;
   });
 }
+function resetRange(sel, lab){
+  const el = $(sel);
+  if(+el.value === 0) return;
+  el.value = 0;
+  $(lab).textContent = '不限';
+}
 function render(){
   const hasRating = places.some(p => p.rating != null);
-  $('#filters').hidden = $('#filtLabel').hidden = !places.length;
-  $('#warnBox').innerHTML = (apiKey && places.length && !hasRating)
+  const hasPrice  = places.some(p => p.price);
+
+  // 沒有評分／價位資料時，把對應的拉桿收起來並歸零 —— 留著只會把結果全濾光
+  if(!hasRating){ resetRange('#minRate','#minRateVal'); resetRange('#minCnt','#minCntVal'); }
+  if(!hasPrice && priceSel.size){
+    priceSel.clear();
+    $('#priceChips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed','false'));
+  }
+  $('#rowRate').hidden = $('#rowCnt').hidden = !hasRating;
+  $('#rowPrice').hidden = !hasPrice;
+  const anyFilter = hasRating || hasPrice;
+  $('#filters').hidden = $('#filtLabel').hidden = !places.length || !anyFilter;
+  $('#noFilt').hidden = !(places.length && !anyFilter);
+
+  $('#warnBox').innerHTML = (googleOn() && places.length && !hasRating)
     ? '<div class="warn">這批結果一個星等都沒回來。很可能是這把金鑰拿不到評分類的欄位（Demo Key 排除使用者產生的內容）。要用評分排序的話，得換成有結帳帳戶的一般金鑰。</div>' : '';
 
   const rows = visible();
