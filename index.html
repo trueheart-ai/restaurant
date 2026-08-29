@@ -61,8 +61,10 @@ input,select,textarea{font-family:inherit}
 .keybox .inner{padding:12px 0 4px;display:flex;gap:8px;flex-wrap:wrap}
 .keybox .hint{width:100%;font-size:12px;color:#6e7a74;line-height:1.75}
 
-.where{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 0}
-.where input,.keybox input{flex:1 1 190px;min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;border-radius:9px;font-size:15px}
+.where{display:flex;flex-direction:column;gap:8px;padding:14px 0}
+.where #btnGps{width:100%}
+.addrRow{display:flex;gap:8px;align-items:center}
+.where input,.keybox input{flex:1 1 auto;min-width:0;background:var(--ink-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;border-radius:9px;font-size:15px}
 .where input::placeholder,.keybox input::placeholder{color:#7d8a84}
 .btn{background:var(--paper);color:var(--ink);font-weight:700;font-size:14px;padding:11px 16px;border-radius:9px;letter-spacing:.04em;white-space:nowrap;display:inline-block;text-decoration:none;text-align:center}
 .btn:active{transform:translateY(1px)}
@@ -251,8 +253,10 @@ input,select,textarea{font-family:inherit}
 
   <div class="where">
     <button class="btn" id="btnGps">用目前位置</button>
-    <input id="addr" placeholder="或輸入地址、地標，例如：台北車站" enterkeyhint="search">
-    <button class="btn ghost" id="btnAddr">定位</button>
+    <div class="addrRow">
+      <input id="addr" placeholder="或輸入地址、地標，例如：台北車站" enterkeyhint="search">
+      <button class="btn ghost" id="btnAddr">定位</button>
+    </div>
     <div class="locnote" id="locnote">先定位，再選分類。</div>
   </div>
 
