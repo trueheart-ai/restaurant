@@ -19,10 +19,26 @@ input,select,textarea{font-family:inherit}
 :focus-visible{outline:2px solid var(--bulb);outline-offset:2px}
 .wrap{
   max-width:430px;margin:0 auto;padding:0 18px 60px;
-  background:var(--ink);min-height:100vh;
-  box-shadow:0 0 0 1px rgba(244,239,228,.07), 0 0 70px rgba(0,0,0,.5);
+  background:var(--ink);min-height:100dvh;
 }
-@media (max-width:466px){ .wrap{box-shadow:none;min-height:100dvh} }
+
+/* 桌機：做成一台立在畫面中央的手機，內容在機身裡面捲動 */
+@media (min-width:720px) and (min-height:620px){
+  body{
+    display:flex;align-items:center;justify-content:center;
+    min-height:100vh;padding:26px 0;
+  }
+  .wrap{
+    width:400px;flex:0 0 auto;
+    height:min(860px, calc(100vh - 52px));
+    overflow-y:auto;overscroll-behavior:contain;
+    border:11px solid #080D0B;border-radius:44px;
+    padding:0 16px 34px;min-height:0;
+    box-shadow:0 0 0 1px rgba(244,239,228,.09), 0 26px 70px rgba(0,0,0,.55);
+    scrollbar-width:none;
+  }
+  .wrap::-webkit-scrollbar{display:none}
+}
 [hidden]{display:none!important}
 
 .sign{padding:26px 0 14px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
@@ -465,7 +481,8 @@ Object.keys(PANES).forEach(t => {
     });
     if(t==='tabFav') renderFavs();
     if(t==='tabLog') renderLogs();
-    window.scrollTo(0,0);
+    const w = document.querySelector('.wrap');
+    (w.scrollHeight > w.clientHeight ? w : window).scrollTo(0,0);
   });
 });
 
