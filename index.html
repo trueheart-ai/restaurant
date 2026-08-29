@@ -69,6 +69,21 @@ input,select,textarea{font-family:inherit}
 .chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
 .chip.live[aria-pressed="true"]{background:#1E7A4B;color:#fff;border-color:#1E7A4B}
 .chip .n{font-size:11.5px;opacity:.65;margin-left:5px}
+
+/* 類別網格：有圖就顯示縮圖，沒圖自動退回 emoji */
+.catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.catcell{
+  background:var(--ink-2);border:1px solid var(--line);border-radius:14px;
+  padding:11px 5px 9px;text-align:center;color:var(--paper-dim);
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+}
+.catcell .pic{width:46px;height:46px;border-radius:13px;object-fit:cover;display:block;background:var(--ink)}
+.catcell .emo{width:46px;height:46px;border-radius:13px;background:var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:25px;line-height:1}
+.catcell .cname{font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:.02em}
+.catcell[aria-pressed="true"]{background:var(--paper);border-color:var(--paper);color:var(--ink)}
+.catcell[aria-pressed="true"] .emo{background:rgba(22,33,29,.08)}
+.catcell[aria-pressed="true"] .cname{font-weight:800}
 .segs{display:flex;gap:6px;flex-wrap:wrap}
 .seg{flex:1 1 0;min-width:66px;border:1px solid var(--line);border-radius:9px;padding:10px 8px;
   font-size:13.5px;font-weight:700;color:var(--paper-dim);text-align:center;white-space:nowrap}
@@ -189,7 +204,7 @@ input,select,textarea{font-family:inherit}
   </section>
 
   <div class="flabel">吃 哪 一 類（可複選，不選＝全部餐廳）</div>
-  <div class="chips" id="chips"></div>
+  <div class="catgrid" id="chips"></div>
 
   <div class="flabel">找 多 遠</div>
   <div class="rowline">
@@ -318,37 +333,37 @@ const PROXY_TOKEN = CFG.proxyToken || '';
 
 /* ══ 分類 ══════════════════════════════════════════ */
 const CATS = [
-  { id:'bbq', label:'燒烤',
+  { id:'bbq', label:'燒烤', emoji:'🍖', img:'img/bbq.jpg',
     gtypes:['barbecue_restaurant','yakiniku_restaurant','korean_barbecue_restaurant','yakitori_restaurant','mongolian_barbecue_restaurant'],
     cuisine:/barbecue|bbq|yakiniku|grill/i, kw:/燒烤|燒肉|烤肉|串燒|炭烤|燒鳥|鐵板燒/ },
-  { id:'hot', label:'火鍋',
+  { id:'hot', label:'火鍋', emoji:'🍲', img:'img/hot.jpg',
     gtypes:['hot_pot_restaurant'],
     cuisine:/hot_?pot|shabu|sukiyaki|steamboat/i, kw:/火鍋|鍋物|涮涮|麻辣鍋|薑母鴨|羊肉爐|石頭鍋/ },
-  { id:'kr', label:'韓式',
+  { id:'kr', label:'韓式', emoji:'🌶', img:'img/kr.jpg',
     gtypes:['korean_restaurant','korean_barbecue_restaurant'],
     cuisine:/korean/i, kw:/韓式|韓國|部隊鍋|馬鈴薯排骨|Korea/i },
-  { id:'it', label:'義式',
+  { id:'it', label:'義式', emoji:'🍝', img:'img/it.jpg',
     gtypes:['italian_restaurant','pizza_restaurant'],
     cuisine:/italian|pizza|pasta/i, kw:/義大利|義式|披薩|比薩|Pizza|Pasta|燉飯/i },
-  { id:'fast', label:'速食',
+  { id:'fast', label:'速食', emoji:'🍔', img:'img/fast.jpg',
     gtypes:['fast_food_restaurant','hamburger_restaurant','chicken_restaurant','sandwich_shop'],
     cuisine:/burger|fried_chicken|sandwich|fast_food/i, amenity:/fast_food/,
     kw:/麥當勞|肯德基|摩斯|漢堡|速食|炸雞|Subway|McDonald|KFC|Burger/i },
-  { id:'jp', label:'日式',
+  { id:'jp', label:'日式', emoji:'🍣', img:'img/jp.jpg',
     gtypes:['japanese_restaurant','ramen_restaurant','sushi_restaurant','japanese_izakaya_restaurant','tonkatsu_restaurant','japanese_curry_restaurant'],
     cuisine:/japanese|sushi|ramen|udon|donburi|izakaya/i, kw:/日式|壽司|拉麵|烏龍麵|丼|定食|居酒屋|豬排/ },
-  { id:'tw', label:'台菜小吃',
+  { id:'tw', label:'台菜小吃', emoji:'🍜', img:'img/tw.jpg',
     gtypes:['taiwanese_restaurant','chinese_restaurant','noodle_shop','chinese_noodle_restaurant','dumpling_restaurant','dim_sum_restaurant'],
     cuisine:/chinese|taiwanese|asian|dumpling|noodle/i,
     kw:/熱炒|快炒|台菜|小吃|滷肉飯|雞肉飯|便當|自助餐|麵店|水餃|牛肉麵|米粉|羹/ },
-  { id:'vn', label:'越式',
+  { id:'vn', label:'越式', emoji:'🥖', img:'img/vn.jpg',
     gtypes:['vietnamese_restaurant'],
     cuisine:/vietnamese/i, kw:/越式|越南|河粉|法國麵包|Pho|Vietnam/i },
-  { id:'drink', label:'手搖飲',
+  { id:'drink', label:'手搖飲', emoji:'🧋', img:'img/drink.jpg',
     gtypes:['tea_house','juice_shop'], gquery:'手搖飲料店',
     cuisine:/bubble_tea|boba|tea|juice|smoothie/i, shop:/bubble_tea|beverages|tea/,
     kw:/手搖|茶飲|飲料|奶茶|珍珠|鮮奶茶|清心|五十嵐|50嵐|迷客夏|麻古|大苑子|可不可|茶湯會|龜記|CoCo|COMEBUY|Chatime|一沐日|得正/i },
-  { id:'cafe', label:'咖啡早午餐',
+  { id:'cafe', label:'咖啡早午餐', emoji:'☕', img:'img/cafe.jpg',
     gtypes:['cafe','coffee_shop','brunch_restaurant','breakfast_restaurant','bakery'],
     cuisine:/coffee|cafe|breakfast|brunch|bakery/i, amenity:/cafe/,
     kw:/咖啡|早午餐|早餐|吐司|Cafe|Coffee|Brunch|烘焙/i },
@@ -517,7 +532,22 @@ function ready(o){
 /* ══ 查詢 ══════════════════════════════════════════ */
 CATS.forEach(c => {
   const b = document.createElement('button');
-  b.className='chip'; b.textContent=c.label; b.setAttribute('aria-pressed','false');
+  b.className = 'catcell';
+  b.setAttribute('aria-pressed','false');
+
+  // 先試著載入 img/xxx.jpg，檔案不在就換成 emoji，網頁不會缺角
+  const slot = document.createElement('img');
+  slot.className = 'pic'; slot.alt = ''; slot.loading = 'lazy'; slot.src = c.img;
+  slot.addEventListener('error', () => {
+    const fb = document.createElement('span');
+    fb.className = 'emo'; fb.textContent = c.emoji;
+    slot.replaceWith(fb);
+  });
+
+  const name = document.createElement('span');
+  name.className = 'cname'; name.textContent = c.label;
+
+  b.append(slot, name);
   b.addEventListener('click', () => {
     picked.has(c.id) ? picked.delete(c.id) : picked.add(c.id);
     b.setAttribute('aria-pressed', picked.has(c.id));
