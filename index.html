@@ -73,16 +73,20 @@ input,select,textarea{font-family:inherit}
 /* 類別網格：有圖就顯示縮圖，沒圖自動退回 emoji */
 .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
 .catcell{
-  background:var(--ink-2);border:1px solid var(--line);border-radius:14px;
-  padding:11px 5px 9px;text-align:center;color:var(--paper-dim);
+  background:var(--paper);border:1px solid var(--paper);border-radius:14px;
+  padding:11px 5px 9px;text-align:center;color:var(--ink);
   display:flex;flex-direction:column;align-items:center;gap:7px;
+  transition:background .15s,border-color .15s,box-shadow .15s;
 }
-.catcell .pic{width:46px;height:46px;border-radius:13px;object-fit:cover;display:block;background:var(--ink)}
-.catcell .emo{width:46px;height:46px;border-radius:13px;background:var(--ink);
+.catcell .pic{width:46px;height:46px;border-radius:13px;object-fit:cover;display:block;background:rgba(22,33,29,.06)}
+.catcell .emo{width:46px;height:46px;border-radius:13px;background:rgba(22,33,29,.06);
   display:flex;align-items:center;justify-content:center;font-size:25px;line-height:1}
 .catcell .cname{font-size:12.5px;font-weight:600;line-height:1.3;letter-spacing:.02em}
-.catcell[aria-pressed="true"]{background:var(--paper);border-color:var(--paper);color:var(--ink)}
-.catcell[aria-pressed="true"] .emo{background:rgba(22,33,29,.08)}
+.catcell[aria-pressed="true"]{
+  background:var(--bulb);border-color:var(--bulb);color:#221A05;
+  box-shadow:0 0 0 3px rgba(235,178,58,.22);
+}
+.catcell[aria-pressed="true"] .emo{background:rgba(34,26,5,.12)}
 .catcell[aria-pressed="true"] .cname{font-weight:800}
 .segs{display:flex;gap:6px;flex-wrap:wrap}
 .seg{flex:1 1 0;min-width:66px;border:1px solid var(--line);border-radius:9px;padding:10px 8px;
