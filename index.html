@@ -92,6 +92,38 @@ input,select,textarea{font-family:inherit}
 .chip.live[aria-pressed="true"]{background:#1E7A4B;color:#fff;border-color:#1E7A4B}
 .chip .n{font-size:11.5px;opacity:.65;margin-left:5px}
 
+/* 收藏分類 */
+.ftags{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px}
+.ftag{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--paper-dim)}
+.ftag[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
+.ftag .n{font-size:11px;opacity:.6;margin-left:5px}
+.pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:999px;margin-right:6px;font-weight:700}
+.pill.want{background:#3A4A42;color:#CFE0D6}
+.pill.been{background:#1E7A4B;color:#fff}
+.pill.love{background:var(--bulb);color:#221A05}
+.pill.no{background:#8C3226;color:#FFE2DC}
+.card.dim{opacity:.62}
+.tagpick{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}
+.tagpick button{font-size:11.5px;padding:4px 10px;border-radius:999px;border:1px solid #c8c0b0;color:#5c6660;font-weight:600}
+.tagpick button.on{border-color:transparent;font-weight:800}
+.tagpick button.on.want{background:#3A4A42;color:#CFE0D6}
+.tagpick button.on.been{background:#1E7A4B;color:#fff}
+.tagpick button.on.love{background:var(--bulb);color:#221A05}
+.tagpick button.on.no{background:#8C3226;color:#FFE2DC}
+
+/* 私房推薦 */
+.recHead{background:var(--ink-2);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.recHead input{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+  padding:10px 12px;border-radius:9px;font-size:15px;margin-bottom:8px}
+.recHead textarea{width:100%;background:var(--ink);border:1px solid var(--line);color:var(--paper);
+  padding:10px 12px;border-radius:9px;font-size:13.5px;resize:vertical;min-height:56px;line-height:1.6;font-family:inherit}
+.recItem .say{font-size:13px;color:#8a5a1f;margin-top:6px;line-height:1.65;white-space:pre-wrap}
+.shareBox{background:var(--ink-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px;
+  font-size:12px;color:var(--paper-dim);word-break:break-all;line-height:1.7;display:none}
+.shareBox.on{display:block}
+.banner{background:var(--bulb);color:#221A05;border-radius:12px;padding:13px 15px;margin-bottom:14px;
+  font-size:13.5px;font-weight:700;line-height:1.7}
+
 /* 類別網格：有圖就顯示縮圖，沒圖自動退回 emoji */
 .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
 .catcell{
@@ -195,8 +227,9 @@ input,select,textarea{font-family:inherit}
 
   <nav class="tabs" role="tablist">
     <button class="tab" role="tab" id="tabFind" aria-selected="true">找店</button>
-    <button class="tab" role="tab" id="tabFav"  aria-selected="false">口袋名單<span class="badge" id="favN">0</span></button>
-    <button class="tab" role="tab" id="tabLog"  aria-selected="false">用餐記錄<span class="badge" id="logN">0</span></button>
+    <button class="tab" role="tab" id="tabFav"  aria-selected="false">口袋<span class="badge" id="favN">0</span></button>
+    <button class="tab" role="tab" id="tabLog"  aria-selected="false">記錄<span class="badge" id="logN">0</span></button>
+    <button class="tab" role="tab" id="tabRec"  aria-selected="false">推薦<span class="badge" id="recN">0</span></button>
   </nav>
 
 <!-- ══════════════ 找店 ══════════════ -->
@@ -275,6 +308,7 @@ input,select,textarea{font-family:inherit}
 
 <!-- ══════════════ 口袋名單 ══════════════ -->
 <section id="paneFav" hidden>
+  <div class="ftags" id="favTags"></div>
   <div class="listhead" style="margin-top:16px">
     <h2>口 袋 名 單</h2>
     <span class="cnt" id="favCnt"></span>
@@ -285,6 +319,28 @@ input,select,textarea{font-family:inherit}
     </select>
   </div>
   <div id="favList"></div>
+</section>
+
+<!-- ══════════════ 私房推薦 ══════════════ -->
+<section id="paneRec" hidden>
+  <div id="recBanner"></div>
+  <div class="recHead" id="recEditHead">
+    <input id="recTitle" placeholder="清單標題，例如：板橋上班族午餐名單">
+    <textarea id="recIntro" placeholder="一段開場白，讓朋友知道這份清單是什麼。"></textarea>
+  </div>
+  <div class="listhead">
+    <h2>推 薦 清 單</h2>
+    <span class="cnt" id="recCnt"></span>
+  </div>
+  <div class="tools" id="recTools">
+    <button class="btn" id="btnRecAdd">＋ 從口袋名單挑</button>
+    <button class="btn ghost" id="btnRecNew">手動新增</button>
+    <button class="btn ghost" id="btnRecCopy">複製成文字</button>
+    <button class="btn ghost" id="btnRecLink">產生分享連結</button>
+  </div>
+  <div class="shareBox" id="shareBox"></div>
+  <div id="recList"></div>
+  <footer class="foot" id="recFoot"></footer>
 </section>
 
 <!-- ══════════════ 用餐記錄 ══════════════ -->
@@ -332,6 +388,32 @@ input,select,textarea{font-family:inherit}
       <button class="btn ghost" id="lsCancel">取消</button>
       <button class="btn" id="lsSave">存起來</button>
     </div>
+  </div>
+</div>
+
+<div class="sheet" id="recSheet">
+  <div class="panel">
+    <h3 id="rsTitle">加進推薦清單</h3>
+    <label class="f">店名</label>
+    <input type="text" id="rsName" placeholder="店名">
+    <label class="f">在哪／怎麼找</label>
+    <input type="text" id="rsWhere" placeholder="例如：板橋文化路、捷運府中站走 3 分鐘">
+    <label class="f">你想跟朋友說什麼</label>
+    <textarea id="rsSay" placeholder="必點什麼、什麼時候去、雷點先講…"></textarea>
+    <div class="row">
+      <button class="btn warn" id="rsDelete" hidden>刪除</button>
+      <button class="btn ghost" id="rsCancel">取消</button>
+      <button class="btn" id="rsSave">存起來</button>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="pickSheet">
+  <div class="panel">
+    <h3>從口袋名單挑</h3>
+    <div class="who" style="font-size:12.5px;color:#5c6660;margin-bottom:12px">點一下就加進推薦清單</div>
+    <div id="pickList"></div>
+    <div class="row"><button class="btn ghost" id="pkClose">關閉</button></div>
   </div>
 </div>
 
@@ -430,13 +512,14 @@ function db(){
   if(dbp) return dbp;
   dbp = new Promise((res,rej)=>{
     if(!window.indexedDB) return rej(new Error('這個瀏覽器不支援 IndexedDB'));
-    const r = indexedDB.open('eatwhat',1);
+    const r = indexedDB.open('eatwhat',2);
     r.onupgradeneeded = e => {
       const d = e.target.result;
       if(!d.objectStoreNames.contains('favs')) d.createObjectStore('favs',{keyPath:'id'});
       if(!d.objectStoreNames.contains('logs')){
         d.createObjectStore('logs',{keyPath:'id',autoIncrement:true}).createIndex('placeId','placeId');
       }
+      if(!d.objectStoreNames.contains('recs')) d.createObjectStore('recs',{keyPath:'id'});
     };
     r.onsuccess = () => res(r.result);
     r.onerror   = () => rej(r.error);
@@ -467,11 +550,12 @@ async function loadStore(){
 function updateBadges(){
   $('#favN').textContent = favs.size;
   $('#logN').textContent = logs.length;
+  $('#recN').textContent = rec.items.length;
 }
 const visitCount = pid => logs.filter(l => l.placeId && l.placeId === pid).length;
 
 /* ══ 分頁 ══════════════════════════════════════════ */
-const PANES = { tabFind:'paneFind', tabFav:'paneFav', tabLog:'paneLog' };
+const PANES = { tabFind:'paneFind', tabFav:'paneFav', tabLog:'paneLog', tabRec:'paneRec' };
 Object.keys(PANES).forEach(t => {
   $('#'+t).addEventListener('click', () => {
     Object.entries(PANES).forEach(([k,v]) => {
@@ -481,6 +565,7 @@ Object.keys(PANES).forEach(t => {
     });
     if(t==='tabFav') renderFavs();
     if(t==='tabLog') renderLogs();
+    if(t==='tabRec') renderRec();
     const w = document.querySelector('.wrap');
     (w.scrollHeight > w.clientHeight ? w : window).scrollTo(0,0);
   });
@@ -873,6 +958,7 @@ function placeCard(p){
         : '<span class="no">沒有評分資料</span>'}
         ${p.price ? '　'+(PRICES.find(x=>x.id===p.price)||{}).label : ''}</div>
       <div class="sub">
+        ${favs.has(p.key) ? '<span class="pill '+tagOf(favs.get(p.key))+'">'+tagLabel(tagOf(favs.get(p.key)))+'</span>' : ''}
         ${been ? '<span class="been">吃過 '+been+' 次</span>' : ''}
         ${p.type ? '<span class="tag">'+esc(p.type)+'</span>' : ''}
         ${p.open===true ? '<span class="open">營業中</span>　' : p.open===false ? '<span class="shut">休息中</span>　' : ''}
@@ -930,21 +1016,58 @@ function showPick(p){
 }
 
 /* ══ 收藏 ══════════════════════════════════════════ */
+const FAVTAGS = [
+  { id:'want', label:'想吃' },
+  { id:'been', label:'吃過' },
+  { id:'love', label:'最愛' },
+  { id:'no',   label:'不推薦' },
+];
+const tagOf = f => f && FAVTAGS.some(t => t.id === f.tag) ? f.tag : 'want';
+const tagLabel = id => (FAVTAGS.find(t => t.id === id) || {}).label || '想吃';
+let favFilter = 'all';
+
 async function toggleFav(p){
   if(favs.has(p.key)){
     await dbDel('favs', p.key); favs.delete(p.key);
   }else{
     const rec = { id:p.key, name:p.name, type:p.type||'', addr:p.addr||'',
       lat:p.lat, lon:p.lon, url:p.url||null,
-      rating:p.rating ?? null, count:p.count||0, note:'', added:Date.now() };
+      rating:p.rating ?? null, count:p.count||0, note:'',
+      tag:'want', added:Date.now() };
     await dbPut('favs', rec); favs.set(rec.id, rec);
   }
   updateBadges();
 }
 
+async function setFavTag(f, tag){
+  f.tag = tag;
+  await dbPut('favs', f);
+  favs.set(f.id, f);
+  renderFavs();
+  if(places.length) render();
+}
+
+function renderFavTags(){
+  const box = $('#favTags');
+  const counts = { all: favs.size };
+  FAVTAGS.forEach(t => counts[t.id] = 0);
+  favs.forEach(f => counts[tagOf(f)]++);
+
+  box.innerHTML = '';
+  [{id:'all', label:'全部'}].concat(FAVTAGS).forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'ftag';
+    b.innerHTML = t.label + '<span class="n">' + (counts[t.id]||0) + '</span>';
+    b.setAttribute('aria-pressed', favFilter === t.id);
+    b.addEventListener('click', () => { favFilter = t.id; renderFavTags(); renderFavs(); });
+    box.appendChild(b);
+  });
+}
+
 function renderFavs(){
+  renderFavTags();
   const box = $('#favList');
-  const rows = [...favs.values()];
+  const rows = [...favs.values()].filter(f => favFilter === 'all' || tagOf(f) === favFilter);
   const mode = $('#favSort').value;
   if(mode==='name') rows.sort((a,b)=>a.name.localeCompare(b.name,'zh-Hant'));
   else if(mode==='rating') rows.sort((a,b)=>(b.rating??-1)-(a.rating??-1));
@@ -952,30 +1075,45 @@ function renderFavs(){
 
   $('#favCnt').textContent = rows.length ? rows.length+' 家' : '';
   if(!rows.length){
-    box.innerHTML = '<div class="empty">還沒有收藏。<br>在「找店」的結果卡片上按 ♥ 就會加進來。</div>';
+    box.innerHTML = '<div class="empty">' + (favs.size
+      ? '「'+tagLabel(favFilter)+'」還沒有店。<br>在下面任何一張卡片上改分類就會進來。'
+      : '還沒有收藏。<br>在「找店」的結果卡片上按 ♥ 就會加進來，預設放在「想吃」。') + '</div>';
     return;
   }
   box.innerHTML = '';
   rows.forEach(f => {
     const been = visitCount(f.id);
+    const tg = tagOf(f);
     const el = document.createElement('div');
-    el.className = 'card';
+    el.className = 'card' + (tg === 'no' ? ' dim' : '');
     el.innerHTML = `
       <div class="body">
         <div class="nm">${esc(f.name)}</div>
         <div class="rate">${f.rating != null ? '★ '+f.rating.toFixed(1)+' <span class="cnt">('+f.count+' 則)</span>' : '<span class="no">沒有評分資料</span>'}</div>
         <div class="sub">
+          <span class="pill ${tg}">${tagLabel(tg)}</span>
           ${been ? '<span class="been">吃過 '+been+' 次</span>' : ''}
           ${f.type ? '<span class="tag">'+esc(f.type)+'</span>' : ''}${esc(f.addr)}
         </div>
         ${f.note ? '<div class="memo">'+esc(f.note)+'</div>' : ''}
+        <div class="tagpick"></div>
       </div>
       <div class="side">
         <a class="mini" href="${mapUrl(f)}" target="_blank" rel="noopener">地圖</a>
         <button class="mini pale" data-a="note">${f.note?'改備註':'加備註'}</button>
+        <button class="mini pale" data-a="rec">推薦</button>
         <button class="mini pale" data-a="log">記一筆</button>
         <button class="mini pale" data-a="del">移除</button>
       </div>`;
+    const pick = el.querySelector('.tagpick');
+    FAVTAGS.forEach(t => {
+      const b = document.createElement('button');
+      b.textContent = t.label;
+      b.className = t.id === tg ? 'on ' + t.id : '';
+      b.addEventListener('click', () => setFavTag(f, t.id));
+      pick.appendChild(b);
+    });
+    el.querySelector('[data-a="rec"]').addEventListener('click', () => openRecItem(null, f));
     el.querySelector('[data-a="note"]').addEventListener('click', () => openFavNote(f));
     el.querySelector('[data-a="log"]').addEventListener('click', () => openLog(null, {key:f.id, name:f.name}));
     el.querySelector('[data-a="del"]').addEventListener('click', async () => {
@@ -1131,6 +1269,209 @@ function renderLogs(){
 $('#logSort').addEventListener('change', renderLogs);
 $('#viewer').addEventListener('click', () => $('#viewer').classList.remove('open'));
 
+/* ══ 私房推薦 ══════════════════════════════════════
+   一份自己編的清單，可以複製成文字或產生連結傳給朋友。
+   分享連結把整份清單編進網址，不需要任何伺服器。 */
+let rec = { id:'main', title:'', intro:'', items:[] };
+let sharedRec = null;          // 從網址讀到的別人的清單
+let editRec = null;
+
+async function loadRec(){
+  try{
+    const all = await dbAll('recs');
+    if(all.length) rec = Object.assign(rec, all[0]);
+  }catch(e){ /* 存不了就用記憶體版 */ }
+  updateBadges();
+}
+async function saveRec(){
+  rec.title = $('#recTitle').value.trim();
+  rec.intro = $('#recIntro').value.trim();
+  try{ await dbPut('recs', rec); }catch(e){}
+  updateBadges();
+}
+
+function openRecItem(existing, fromFav){
+  editRec = existing;
+  $('#rsTitle').textContent = existing ? '編輯這一家' : '加進推薦清單';
+  $('#rsName').value  = existing ? existing.name  : (fromFav ? fromFav.name : '');
+  $('#rsWhere').value = existing ? existing.where : (fromFav ? (fromFav.addr || '') : '');
+  $('#rsSay').value   = existing ? existing.say   : (fromFav ? (fromFav.note || '') : '');
+  $('#rsName').dataset.url = existing ? (existing.url||'') : (fromFav ? (fromFav.url || mapUrl(fromFav)) : '');
+  $('#rsDelete').hidden = !existing;
+  $('#recSheet').classList.add('open');
+}
+$('#rsCancel').addEventListener('click', () => $('#recSheet').classList.remove('open'));
+$('#rsSave').addEventListener('click', async () => {
+  const name = $('#rsName').value.trim();
+  if(!name){ $('#rsName').focus(); return; }
+  const item = { name, where:$('#rsWhere').value.trim(), say:$('#rsSay').value.trim(),
+                 url:$('#rsName').dataset.url || '' };
+  if(editRec){ Object.assign(editRec, item); }
+  else { rec.items.push(item); }
+  await saveRec();
+  $('#recSheet').classList.remove('open');
+  renderRec();
+});
+$('#rsDelete').addEventListener('click', async () => {
+  rec.items = rec.items.filter(i => i !== editRec);
+  await saveRec();
+  $('#recSheet').classList.remove('open');
+  renderRec();
+});
+$('#btnRecNew').addEventListener('click', () => openRecItem(null, null));
+$('#recTitle').addEventListener('change', saveRec);
+$('#recIntro').addEventListener('change', saveRec);
+
+/* 從口袋名單挑 */
+$('#btnRecAdd').addEventListener('click', () => {
+  const box = $('#pickList');
+  const rows = [...favs.values()].filter(f => tagOf(f) !== 'no');
+  if(!rows.length){
+    box.innerHTML = '<div style="font-size:13.5px;color:#5c6660;padding:18px 0;line-height:1.9">'
+      + '口袋名單裡還沒有可以推薦的店。<br>先去收藏幾家，「不推薦」的不會出現在這裡。</div>';
+  }else{
+    box.innerHTML = '';
+    rows.sort((a,b) => (tagOf(a)==='love'?0:1) - (tagOf(b)==='love'?0:1));
+    rows.forEach(f => {
+      const b = document.createElement('button');
+      b.style.cssText = 'display:block;width:100%;text-align:left;padding:11px 12px;border-radius:10px;'
+        + 'border:1px solid #c8c0b0;margin-bottom:7px;font-size:14.5px;color:#3E3833';
+      b.innerHTML = '<b>' + esc(f.name) + '</b>'
+        + '<span style="font-size:11.5px;color:#5c6660;margin-left:8px">' + tagLabel(tagOf(f)) + '</span>';
+      b.addEventListener('click', () => {
+        $('#pickSheet').classList.remove('open');
+        openRecItem(null, f);
+      });
+      box.appendChild(b);
+    });
+  }
+  $('#pickSheet').classList.add('open');
+});
+$('#pkClose').addEventListener('click', () => $('#pickSheet').classList.remove('open'));
+
+/* 純文字版，貼到 LINE 用 */
+function recAsText(r){
+  const lines = [];
+  if(r.title) lines.push('【' + r.title + '】');
+  if(r.intro) lines.push(r.intro, '');
+  r.items.forEach((i, n) => {
+    lines.push((n+1) + '. ' + i.name + (i.where ? '（' + i.where + '）' : ''));
+    if(i.say) lines.push('   ' + i.say);
+  });
+  return lines.join('\n');
+}
+$('#btnRecCopy').addEventListener('click', async () => {
+  if(!rec.items.length){ alert('清單還是空的。'); return; }
+  const text = recAsText(rec);
+  try{
+    await navigator.clipboard.writeText(text);
+    $('#shareBox').className = 'shareBox on';
+    $('#shareBox').textContent = '已複製到剪貼簿，可以直接貼到 LINE。';
+  }catch(e){
+    $('#shareBox').className = 'shareBox on';
+    $('#shareBox').textContent = text;
+  }
+});
+
+/* 分享連結：整份清單編進網址，不需要伺服器 */
+function b64e(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  bytes.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64d(str){
+  const bin = atob(str.replace(/-/g,'+').replace(/_/g,'/'));
+  const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+$('#btnRecLink').addEventListener('click', async () => {
+  if(!rec.items.length){ alert('清單還是空的。'); return; }
+  const slim = { t:rec.title, i:rec.intro,
+    s:rec.items.map(x => ({ n:x.name, w:x.where, y:x.say, u:x.url })) };
+  const url = location.origin + location.pathname + '?rec=' + b64e(JSON.stringify(slim));
+  const box = $('#shareBox');
+  box.className = 'shareBox on';
+  if(url.length > 6000){
+    box.textContent = '清單太長了（' + url.length + ' 字元），有些通訊軟體會把網址截斷。'
+      + '建議減少幾家，或改用「複製成文字」。';
+    return;
+  }
+  try{
+    await navigator.clipboard.writeText(url);
+    box.textContent = '連結已複製（' + url.length + ' 字元）。傳給朋友，他打開就會看到這份清單。';
+  }catch(e){ box.textContent = url; }
+});
+
+function renderRec(){
+  const box = $('#recList');
+  const r = sharedRec || rec;
+  const ro = !!sharedRec;
+
+  $('#recEditHead').hidden = ro;
+  $('#recTools').hidden = ro;
+  if(!ro){
+    if(document.activeElement !== $('#recTitle')) $('#recTitle').value = rec.title || '';
+    if(document.activeElement !== $('#recIntro')) $('#recIntro').value = rec.intro || '';
+  }
+  $('#recBanner').innerHTML = ro
+    ? '<div class="banner">這是別人分享的清單' + (r.title ? '：' + esc(r.title) : '')
+      + '<br><span style="font-weight:400">' + esc(r.intro || '') + '</span></div>'
+      + '<div class="tools"><button class="btn" id="btnMine">看我自己的清單</button></div>'
+    : '';
+  if(ro) $('#btnMine').addEventListener('click', () => {
+    sharedRec = null;
+    history.replaceState(null, '', location.pathname);
+    renderRec();
+  });
+
+  $('#recCnt').textContent = r.items.length ? r.items.length + ' 家' : '';
+  $('#recFoot').textContent = ro ? ''
+    : '清單存在這台裝置。用「複製成文字」貼進 LINE，或「產生分享連結」傳網址給朋友。';
+
+  if(!r.items.length){
+    box.innerHTML = '<div class="empty">清單還是空的。<br>'
+      + '按「從口袋名單挑」把收藏的店加進來，或手動新增。</div>';
+    return;
+  }
+  box.innerHTML = '';
+  r.items.forEach(i => {
+    const el = document.createElement('div');
+    el.className = 'card recItem';
+    el.innerHTML = `
+      <div class="body">
+        <div class="nm">${esc(i.name)}</div>
+        ${i.where ? '<div class="sub">'+esc(i.where)+'</div>' : ''}
+        ${i.say ? '<div class="say">'+esc(i.say)+'</div>' : ''}
+      </div>
+      <div class="side"></div>`;
+    const side = el.querySelector('.side');
+    const link = i.url || ('https://www.google.com/maps/search/' + encodeURIComponent(i.name));
+    const a = document.createElement('a');
+    a.className = 'mini'; a.href = link; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '地圖';
+    side.appendChild(a);
+    if(!ro){
+      const e = document.createElement('button');
+      e.className = 'mini pale'; e.textContent = '編輯';
+      e.addEventListener('click', () => openRecItem(i, null));
+      side.appendChild(e);
+    }
+    box.appendChild(el);
+  });
+}
+
+/* 網址帶了 ?rec= 就顯示別人分享的清單 */
+function checkSharedRec(){
+  const q = new URLSearchParams(location.search).get('rec');
+  if(!q) return;
+  try{
+    const d = JSON.parse(b64d(q));
+    sharedRec = { title:d.t||'', intro:d.i||'',
+      items:(d.s||[]).map(x => ({ name:x.n, where:x.w||'', say:x.y||'', url:x.u||'' })) };
+    $('#tabRec').click();
+  }catch(e){ console.warn('分享連結讀不動：', e); }
+}
+
 /* ══ 匯出／匯入 ════════════════════════════════════ */
 const toDataUrl = b => new Promise(r => { const f=new FileReader(); f.onload=()=>r(f.result); f.readAsDataURL(b); });
 async function fromDataUrl(s){ return (await fetch(s)).blob(); }
@@ -1173,11 +1514,11 @@ $('#fileIn').addEventListener('change', e => {
 });
 
 /* ══ 其他控制 ══════════════════════════════════════ */
-[$('#logSheet'), $('#favSheet')].forEach(s =>
+[$('#logSheet'), $('#favSheet'), $('#recSheet'), $('#pickSheet')].forEach(s =>
   s.addEventListener('click', e => { if(e.target === s) s.classList.remove('open'); }));
 
 refreshMode();
-loadStore();
+loadStore().then(loadRec).then(checkSharedRec);
 </script>
 </body>
 </html>
