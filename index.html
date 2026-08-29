@@ -69,6 +69,11 @@ input,select,textarea{font-family:inherit}
 .chip[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper);font-weight:700}
 .chip.live[aria-pressed="true"]{background:#1E7A4B;color:#fff;border-color:#1E7A4B}
 .chip .n{font-size:11.5px;opacity:.65;margin-left:5px}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.seg{flex:1 1 0;min-width:66px;border:1px solid var(--line);border-radius:9px;padding:10px 8px;
+  font-size:13.5px;font-weight:700;color:var(--paper-dim);text-align:center;white-space:nowrap}
+.seg[aria-pressed="true"]{background:var(--bulb);color:#221A05;border-color:var(--bulb)}
+.segs.sort .seg[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .rowline{display:flex;align-items:center;gap:12px;margin-bottom:9px}
 .rowline[hidden]{display:none}
 .rowline label{font-size:13px;color:var(--paper-dim);min-width:66px}
@@ -196,12 +201,9 @@ input,select,textarea{font-family:inherit}
   <div class="listhead">
     <h2>結 果</h2>
     <span class="cnt" id="cnt"></span>
-    <select id="sortBy">
-      <option value="rating">依評分</option>
-      <option value="dist">依距離</option>
-      <option value="count">依評論數</option>
-    </select>
   </div>
+  <div class="flabel" style="margin-top:0">排 序 依 據</div>
+  <div class="segs sort" id="sortSegs"></div>
 
   <div class="flabel" id="filtLabel" hidden>再 篩 一 次</div>
   <div id="filters" hidden>
@@ -211,13 +213,11 @@ input,select,textarea{font-family:inherit}
     </div>
     <div class="rowline" id="rowRate">
       <label>最低星等</label>
-      <input type="range" id="minRate" min="0" max="4.8" step="0.1" value="0">
-      <b id="minRateVal">不限</b>
+      <div class="segs" id="rateSegs" style="flex:1"></div>
     </div>
     <div class="rowline" id="rowCnt">
       <label>最少評論</label>
-      <input type="range" id="minCnt" min="0" max="500" step="10" value="0">
-      <b id="minCntVal">不限</b>
+      <div class="segs" id="cntSegs" style="flex:1"></div>
     </div>
     <div class="rowline" id="rowPrice">
       <label>價位</label>
@@ -453,7 +453,8 @@ function refreshMode(){
   const g = googleOn();
   $('#modeTag').textContent = proxyUrl ? '代理模式' : apiKey ? 'Google 模式' : 'OSM 模式';
   $('#modeTag').classList.toggle('g', g);
-  $('#sortBy').value = g ? 'rating' : 'dist';
+  sortMode = g ? 'rating' : 'dist';
+  if(typeof sortSegs !== 'undefined') sortSegs.set(sortMode);
   $('#foot').innerHTML = g
     ? '店家資料與評分來自 Google 地圖。星等和評論數為 Google 使用者所評，非本工具產生。營業狀態依店家自填的營業時間推算，僅供參考。'
     : '店家資料 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 貢獻者。這個模式沒有星等和營業狀態，點「地圖」可以到 Google 上看。';
@@ -482,6 +483,7 @@ $('#btnKeyClear').addEventListener('click', () => {
 /* ══ 定位 ══════════════════════════════════════════ */
 let origin = null, places = [], picked = new Set(), priceSel = new Set();
 let openOnly = false, rollTimer = null, quotaNote = '';
+let sortMode = 'dist', minRate = 0, minCnt = 0;
 function setNote(m,bad){ const e=$('#locnote'); e.textContent=m; e.classList.toggle('bad',!!bad); }
 
 $('#btnGps').addEventListener('click', () => {
@@ -536,6 +538,44 @@ $('#chipOpen').addEventListener('click', () => {
   $('#chipOpen').setAttribute('aria-pressed', openOnly);
   render();
 });
+
+/** 單選按鈕組。回傳 {set} 讓程式也能改選中狀態。 */
+function segGroup(sel, options, initial, onPick){
+  const box = $(sel);
+  box.innerHTML = '';
+  const btns = options.map(o => {
+    const b = document.createElement('button');
+    b.className = 'seg';
+    b.textContent = o.label;
+    b.dataset.v = String(o.value);
+    b.setAttribute('aria-pressed', o.value === initial);
+    b.addEventListener('click', () => { paint(o.value); onPick(o.value); });
+    box.appendChild(b);
+    return b;
+  });
+  function paint(v){ btns.forEach(b => b.setAttribute('aria-pressed', b.dataset.v === String(v))); }
+  return { set: paint };
+}
+
+const sortSegs = segGroup('#sortSegs', [
+  { label:'評分',   value:'rating' },
+  { label:'距離',   value:'dist' },
+  { label:'評論數', value:'count' },
+], sortMode, v => { sortMode = v; render(); });
+
+const rateSegs = segGroup('#rateSegs', [
+  { label:'不限',   value:0 },
+  { label:'3.5 ★', value:3.5 },
+  { label:'4.0 ★', value:4.0 },
+  { label:'4.5 ★', value:4.5 },
+], minRate, v => { minRate = v; render(); });
+
+const cntSegs = segGroup('#cntSegs', [
+  { label:'不限',  value:0 },
+  { label:'200+',  value:200 },
+  { label:'500+',  value:500 },
+  { label:'1000+', value:1000 },
+], minCnt, v => { minCnt = v; render(); });
 
 $('#btnGo').addEventListener('click', () => googleOn() ? fetchGoogle() : fetchOSM());
 $('#radius').addEventListener('input', e => $('#radiusVal').textContent = e.target.value+' m');
@@ -664,17 +704,11 @@ function classifyOSM(t){
 /* ══ 結果清單 ══════════════════════════════════════ */
 const mapUrl = p => p.url || ('https://www.google.com/maps/search/'+encodeURIComponent(p.name)+'/@'+p.lat+','+p.lon+',18z');
 
-function resetRange(sel, lab){
-  const el = $(sel);
-  if(+el.value === 0) return;
-  el.value = 0; $(lab).textContent = '不限';
-}
 function visible(){
-  const minR = +$('#minRate').value, minC = +$('#minCnt').value;
   return places.filter(p => {
     if(openOnly && p.open !== true) return false;
-    if(minR && (p.rating ?? 0) < minR) return false;
-    if(minC && p.count < minC) return false;
+    if(minRate && (p.rating ?? 0) < minRate) return false;
+    if(minCnt && p.count < minCnt) return false;
     if(priceSel.size && (!p.price || !priceSel.has(p.price))) return false;
     return true;
   });
@@ -686,7 +720,10 @@ function render(){
   const openCount = places.filter(p => p.open === true).length;
 
   // 沒有對應資料的篩選條件收起來並歸零，留著只會把結果全濾光
-  if(!hasRating){ resetRange('#minRate','#minRateVal'); resetRange('#minCnt','#minCntVal'); }
+  if(!hasRating){
+    if(minRate){ minRate = 0; rateSegs.set(0); }
+    if(minCnt){ minCnt = 0; cntSegs.set(0); }
+  }
   if(!hasPrice && priceSel.size){
     priceSel.clear();
     $('#priceChips').querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed','false'));
@@ -705,9 +742,8 @@ function render(){
     ? '<div class="warn">這批結果一個星等都沒回來。很可能是這把金鑰拿不到評分類的欄位。要用評分排序的話，得換成有結帳帳戶的一般金鑰。</div>' : '';
 
   const rows = visible();
-  const mode = $('#sortBy').value;
-  if(mode==='rating') rows.sort((a,b)=>(b.rating??-1)-(a.rating??-1) || b.count-a.count);
-  else if(mode==='count') rows.sort((a,b)=>b.count-a.count || a.dist-b.dist);
+  if(sortMode==='rating') rows.sort((a,b)=>(b.rating??-1)-(a.rating??-1) || b.count-a.count);
+  else if(sortMode==='count') rows.sort((a,b)=>b.count-a.count || a.dist-b.dist);
   else rows.sort((a,b)=>a.dist-b.dist);
 
   $('#cnt').textContent = rows.length ? rows.length+' 家'+(openOnly?'（營業中）':'') : '';
@@ -1038,15 +1074,6 @@ $('#fileIn').addEventListener('change', e => {
 });
 
 /* ══ 其他控制 ══════════════════════════════════════ */
-$('#sortBy').addEventListener('change', render);
-$('#minRate').addEventListener('input', e => {
-  $('#minRateVal').textContent = +e.target.value ? '★ '+(+e.target.value).toFixed(1)+' 以上' : '不限';
-  render();
-});
-$('#minCnt').addEventListener('input', e => {
-  $('#minCntVal').textContent = +e.target.value ? (+e.target.value)+' 則以上' : '不限';
-  render();
-});
 [$('#logSheet'), $('#favSheet')].forEach(s =>
   s.addEventListener('click', e => { if(e.target === s) s.classList.remove('open'); }));
 
