@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>今天吃什麼</title>
+<title>今天吃什麼？</title>
 <style>
 :root{
   --ink:#16211D; --ink-2:#1F2E28; --paper:#F4EFE4; --paper-dim:#DED6C6;
@@ -52,7 +52,7 @@ input,select,textarea{font-family:inherit}
 
 .lightbox{margin:6px 0 20px;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#20302A,#182420);border:1px solid var(--line)}
 .lightbox .bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--sign-red)}
-.lightbox .bar b{font-size:14px;letter-spacing:.14em;font-weight:800}
+.lightbox .bar b{font-size:14px;letter-spacing:.04em;font-weight:800;white-space:nowrap}
 .lightbox .bar span{margin-left:auto;font-size:12px;opacity:.9}
 .slot{padding:22px 18px 20px;text-align:center;min-height:130px;display:flex;flex-direction:column;justify-content:center;gap:6px}
 .slot .name{font-size:clamp(21px,5.6vw,29px);font-weight:900;word-break:break-word}
@@ -60,7 +60,7 @@ input,select,textarea{font-family:inherit}
 .slot .idle{font-size:14px;color:#7d8a84;letter-spacing:.05em}
 .slot.rolling .name{color:var(--bulb);opacity:.75}
 .slot .actions{display:flex;gap:8px;justify-content:center;margin-top:8px;flex-wrap:wrap}
-.roll{display:block;width:100%;background:var(--bulb);color:#221A05;font-size:17px;font-weight:900;letter-spacing:.16em;padding:16px}
+.roll{display:block;width:100%;background:var(--bulb);color:#221A05;font-size:17px;font-weight:900;letter-spacing:.06em;padding:16px}
 .roll[disabled]{background:#4a4a3f;color:#8d8d80}
 
 .flabel{font-size:11.5px;letter-spacing:.2em;color:#7d8a84;font-weight:700;margin:14px 0 9px}
@@ -89,13 +89,13 @@ input,select,textarea{font-family:inherit}
 .catcell[aria-pressed="true"] .emo{background:rgba(34,26,5,.12)}
 .catcell[aria-pressed="true"] .cname{font-weight:800}
 .segs{display:flex;gap:6px;flex-wrap:wrap}
-.seg{flex:1 1 0;min-width:66px;border:1px solid var(--line);border-radius:9px;padding:10px 8px;
-  font-size:13.5px;font-weight:700;color:var(--paper-dim);text-align:center;white-space:nowrap}
+.seg{flex:1 1 0;min-width:0;border:1px solid var(--line);border-radius:9px;padding:10px 4px;
+  font-size:13px;font-weight:700;color:var(--paper-dim);text-align:center;white-space:nowrap}
 .seg[aria-pressed="true"]{background:var(--bulb);color:#221A05;border-color:var(--bulb)}
 .segs.sort .seg[aria-pressed="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .rowline{display:flex;align-items:center;gap:12px;margin-bottom:9px}
 .rowline[hidden]{display:none}
-.rowline label{font-size:13px;color:var(--paper-dim);min-width:66px}
+.rowline label{font-size:13px;color:var(--paper-dim);min-width:34px;flex:0 0 auto}
 .rowline input[type=range]{flex:1;accent-color:var(--sign-red)}
 .rowline b{font-size:13.5px;min-width:70px;text-align:right;color:var(--bulb)}
 .go{width:100%;background:var(--sign-red);color:#fff;font-size:15px;font-weight:800;letter-spacing:.14em;padding:14px;border-radius:10px;margin-top:12px}
@@ -167,7 +167,7 @@ input,select,textarea{font-family:inherit}
 <div class="wrap">
 
   <header class="sign">
-    <h1>今天<em>吃什麼</em></h1>
+    <h1>今天<em>吃什麼</em>？</h1>
     <span class="mode" id="modeTag">OSM 模式</span>
   </header>
 
@@ -202,9 +202,9 @@ input,select,textarea{font-family:inherit}
   </div>
 
   <section class="lightbox">
-    <div class="bar"><b>今 日 指 定</b><span id="poolInfo">候選 0 家</span></div>
+    <div class="bar"><b>交給命運選擇吧～</b><span id="poolInfo">候選 0 家</span></div>
     <div class="slot" id="slot"><div class="idle">先找店，再按下面那顆按鈕</div></div>
-    <button class="roll" id="btnRoll" disabled>抽 一 家</button>
+    <button class="roll" id="btnRoll" disabled>就決定是你了！</button>
   </section>
 
   <div class="flabel">吃 哪 一 類（可複選，不選＝全部餐廳）</div>
@@ -227,11 +227,11 @@ input,select,textarea{font-family:inherit}
       <button class="chip live" id="chipOpen" aria-pressed="false">只看營業中<span class="n" id="openN"></span></button>
     </div>
     <div class="rowline" id="rowRate">
-      <label>最低星等</label>
+      <label>星等</label>
       <div class="segs" id="rateSegs" style="flex:1"></div>
     </div>
     <div class="rowline" id="rowCnt">
-      <label>最少評論</label>
+      <label>評論</label>
       <div class="segs" id="cntSegs" style="flex:1"></div>
     </div>
     <div class="rowline" id="rowPrice">
