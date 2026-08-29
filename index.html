@@ -7,16 +7,22 @@
 <style>
 :root{
   --ink:#16211D; --ink-2:#1F2E28; --paper:#F4EFE4; --paper-dim:#DED6C6;
+  --ink-out:#0C1411;
   --sign-red:#D8402F; --bulb:#EBB83C; --line:rgba(244,239,228,.16);
   --font:"PingFang TC","Noto Sans TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--ink);color:var(--paper);font-family:var(--font);-webkit-text-size-adjust:100%}
-body{padding:0 0 60px;line-height:1.55}
+html,body{background:var(--ink-out);color:var(--paper);font-family:var(--font);-webkit-text-size-adjust:100%}
+body{padding:0;line-height:1.55}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:inherit}
 :focus-visible{outline:2px solid var(--bulb);outline-offset:2px}
-.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+.wrap{
+  max-width:430px;margin:0 auto;padding:0 18px 60px;
+  background:var(--ink);min-height:100vh;
+  box-shadow:0 0 0 1px rgba(244,239,228,.07), 0 0 70px rgba(0,0,0,.5);
+}
+@media (max-width:466px){ .wrap{box-shadow:none;min-height:100dvh} }
 [hidden]{display:none!important}
 
 .sign{padding:26px 0 14px;display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
