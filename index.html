@@ -180,7 +180,7 @@ input,select,textarea{font-family:inherit}
 <!-- ══════════════ 找店 ══════════════ -->
 <section id="paneFind">
   <details class="keybox" id="keybox">
-    <summary>連線設定</summary>
+    <summary id="keySummary">連線設定</summary>
     <div class="inner">
       <input id="proxyUrl" placeholder="Apps Script 代理網址（.../exec）" autocomplete="off">
       <input id="proxyToken" placeholder="通行碼" autocomplete="off" style="flex:0 1 150px">
@@ -471,8 +471,14 @@ const googleOn = () => !!(proxyUrl || apiKey);
 
 function refreshMode(){
   const g = googleOn();
-  $('#modeTag').textContent = proxyUrl ? '代理模式' : apiKey ? 'Google 模式' : 'OSM 模式';
-  $('#modeTag').classList.toggle('g', g);
+  const label = proxyUrl ? '代理模式' : apiKey ? 'Google 模式' : 'OSM 模式';
+
+  // 一切正常時不用告訴使用者背後是怎麼接的；只有掉回無評分模式才提醒，
+  // 因為那會影響他們看到的東西。真正的狀態放在「連線設定」裡給你自己看。
+  $('#modeTag').hidden = g;
+  $('#modeTag').textContent = '簡易模式・無評分';
+  $('#modeTag').classList.toggle('g', false);
+  $('#keySummary').textContent = '連線設定（' + label + '）';
   sortMode = g ? 'rating' : 'dist';
   if(typeof sortSegs !== 'undefined') sortSegs.set(sortMode);
   $('#foot').innerHTML = g
