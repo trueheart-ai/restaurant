@@ -517,16 +517,51 @@ $('#btnGps').addEventListener('click', () => {
 $('#btnAddr').addEventListener('click', geocode);
 $('#addr').addEventListener('keydown', e => { if(e.key==='Enter') geocode(); });
 
+async function nomi(q, tw){
+  const u = 'https://nominatim.openstreetmap.org/search?format=json&limit=5'
+          + '&accept-language=zh-TW' + (tw ? '&countrycodes=tw' : '')
+          + '&q=' + encodeURIComponent(q);
+  const r = await fetch(u);
+  if(r.status === 403 || r.status === 429) throw new Error('RATE');
+  if(!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
 async function geocode(){
   const q = $('#addr').value.trim();
   if(!q){ setNote('先打個地點名稱。',true); return; }
   setNote('找「'+q+'」…');
-  try{
-    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-TW&q='+encodeURIComponent(q));
-    const j = await r.json();
-    if(!j.length){ setNote('找不到「'+q+'」。加上縣市再試一次。',true); return; }
-    ready({lat:+j[0].lat, lon:+j[0].lon, label:j[0].display_name.split(',')[0]});
-  }catch(e){ setNote('地址查詢失敗。改按「用目前位置」。',true); }
+
+  // OSM 對台灣中文門牌的收錄很稀疏，所以多試幾種寫法再放棄
+  const tries = [
+    [q, true],             // 先限定台灣，命中率最高
+    [q + ' 台灣', false],  // 有些資料要帶國名才對得上
+    [q, false],            // 最後不設限
+  ];
+
+  for(let i = 0; i < tries.length; i++){
+    const [text, tw] = tries[i];
+    try{
+      const j = await nomi(text, tw);
+      if(j.length){
+        const hit = j[0];
+        ready({ lat:+hit.lat, lon:+hit.lon, label:hit.display_name.split(',')[0] });
+        return;
+      }
+    }catch(e){
+      setNote(e.message === 'RATE'
+        ? '地址查詢被限流了（這個免費服務每秒只能查一次）。等十幾秒再試，或直接按「用目前位置」。'
+        : '地址查詢失敗（'+e.message+'）。改按「用目前位置」。', true);
+      return;
+    }
+    if(i < tries.length - 1){
+      setNote('找「'+q+'」…換個寫法再試（'+(i+2)+'/'+tries.length+'）');
+      await new Promise(r => setTimeout(r, 1100));   // Nominatim 規定每秒最多一次
+    }
+  }
+
+  setNote('查不到「'+q+'」。這個免費地址服務對台灣門牌的支援不好，'
+        + '改打車站、學校、百貨、夜市這類地標比較容易命中，或直接按「用目前位置」。', true);
 }
 function ready(o){
   origin = o; $('#btnGo').disabled = false;
